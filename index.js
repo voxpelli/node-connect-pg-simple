@@ -61,7 +61,7 @@ module.exports = function (connect) {
     if (Math.random() < 0.05) {
       this.query('DELETE FROM session WHERE expire < NOW()');
     }
-    this.query('SELECT sess FROM session WHERE sid = $1', [sid], function (err, data) {
+    this.query('SELECT sess FROM session WHERE sid = $1 AND expire >= NOW()', [sid], function (err, data) {
       if (err) return fn(err);
       if (!data) return fn();
       return fn(null, data.sess);
