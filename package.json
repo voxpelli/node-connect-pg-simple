@@ -1,0 +1,23 @@
+{
+  "name": "connect-pg-simple",
+  "version": "1.0.0",
+  "description": "A simple, minimal PostgreSQL session store for Connect/Express",
+  "url": "http://github.com/voxpelli/node-connect-pg-simple",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/voxpelli/node-connect-pg-simple.git"
+  },
+  "author": {
+    "name": "Pelle Wessman",
+    "email": "pelle@kodfabrik.se",
+    "url": "http://kodfabrik.se/"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^2.7.0"
+  },
+  "engines": {
+    "node": "0.10.x"
+  },
+  "main": "index.js"
+}
