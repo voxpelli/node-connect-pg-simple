@@ -38,6 +38,10 @@ app.use(express.session({
 
 ## Changelog
 
+### 1.0.1
+
+* Fix for sometimes not expiring sessions correctly
+
 ### 1.0.0
 
 * First NPM-version of the script originally published as a Gist here: https://gist.github.com/voxpelli/6447728
