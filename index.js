@@ -67,9 +67,9 @@ module.exports = function (connect) {
       try {
         return fn(null, ("string" == typeof data.sess) ? JSON.parse(data.sess) : data.sess);
       } catch(e) {
-        return fn(e);
+        return this.destroy(sid, fn);
       }
-    });
+    }.bind(this));
   };
 
   /**
