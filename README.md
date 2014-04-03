@@ -34,7 +34,7 @@ app.use(express.session({
 
 * **pg** - if you want the session store to use the same database module as the rest of your app, send it in here.
 * **ttl** - the time to live for the session in the database – specified in seconds. Defaults to the cookie maxAge if the cookie has a maxAge defined and otherwise defaults to one day.
-* **conString** - if you don't have your PostgreSQL connection string in the DATABASE_URL environment variable (as you do by default on eg. Heroku) – then you need to send the connection string here as this module uses its own connection.
+* **conString** - if you don't have your PostgreSQL connection string in the DATABASE_URL environment variable (as you do by default on eg. Heroku) – then you need to send the connection [string or object](https://github.com/brianc/node-postgres/wiki/pg#connectstring-connectionstring-function-callback) here as this module uses its own connection.
 
 ## Changelog
 
