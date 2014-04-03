@@ -64,7 +64,11 @@ module.exports = function (connect) {
     this.query('SELECT sess FROM session WHERE sid = $1 AND expire >= NOW()', [sid], function (err, data) {
       if (err) return fn(err);
       if (!data) return fn();
-      return fn(null, data.sess);
+      try {
+        return fn(null, ("string" == typeof data.sess) ? JSON.parse(data.sess) : data.sess);
+      } catch(e) {
+        return fn(e);
+      }
     });
   };
 
