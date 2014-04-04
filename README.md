@@ -38,6 +38,10 @@ app.use(express.session({
 
 ## Changelog
 
+### 1.0.2
+
+* Support for PostgreSQL versions older than 9.2
+
 ### 1.0.1
 
 * Fix for sometimes not expiring sessions correctly
