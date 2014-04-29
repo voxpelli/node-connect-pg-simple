@@ -2,12 +2,26 @@
 
 A simple, minimal PostgreSQL session store for Connect/Express
 
+## Installation
+
+```bash
+npm install connect-pg-simple
+```
+
+Once npm installed the module, you need to create the **session** table in your database. For that you can use the [table.sql] (https://github.com/voxpelli/node-connect-pg-simple/blob/master/table.sql) file provided with the module: 
+
+```bash
+psql mydatabase < node_modules/connect-pg-simple/table.sql
+```
+
+Or simply play the file via the pgAdminIII queries tool.
+
 ## Usage
 
 Simple:
 
 ```javascript
-var pgSession = require('./utils/pg-session')(express);
+var pgSession = require('connect-pg-simple')(express);
 app.use(express.session({
   store: new pgSession(),
   secret: process.env.FOO_COOKIE_SECRET,
@@ -19,7 +33,7 @@ Advanced:
 
 ```javascript
 var pg = require('pg')
-  , pgSession = require('./utils/pg-session')(express);
+  , pgSession = require('connect-pg-simple')(express);
 
 app.use(express.session({
   store: new pgSession({
