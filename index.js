@@ -1,8 +1,8 @@
 var oneDay = 86400;
 
-module.exports = function (connect) {
+module.exports = function (session) {
 
-  var Store = connect.session.Store
+  var Store = session.Store
     , PGStore;
 
   PGStore = function (options) {
