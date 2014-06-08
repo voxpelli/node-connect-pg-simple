@@ -13,7 +13,7 @@ module.exports = function (session) {
 
     this.conString = options.conString || process.env.DATABASE_URL;
     this.ttl =  options.ttl;
-    this.pg = options.pg || require('pg');
+    this.pg = options.pg || require('pg.js');
   };
 
   /**
