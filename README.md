@@ -21,8 +21,10 @@ Or simply play the file via the pgAdminIII queries tool.
 Simple:
 
 ```javascript
-var pgSession = require('connect-pg-simple')(express);
-app.use(express.session({
+var session = require('express-session')
+  , pgSession = require('connect-pg-simple')(session);
+
+app.use(session({
   store: new pgSession(),
   secret: process.env.FOO_COOKIE_SECRET,
   cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
@@ -33,9 +35,10 @@ Advanced:
 
 ```javascript
 var pg = require('pg')
-  , pgSession = require('connect-pg-simple')(express);
+  , session = require('express-session')
+  , pgSession = require('connect-pg-simple')(session);
 
-app.use(express.session({
+app.use(session({
   store: new pgSession({
     pg : pg
   }),
