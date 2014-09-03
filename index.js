@@ -11,7 +11,7 @@ module.exports = function (session) {
     options = options || {};
     Store.call(this, options);
 
-    this.tableName = options.tableName || "session";
+    this.tableName = options.tableName || 'session';
     this.conString = options.conString || process.env.DATABASE_URL;
     this.ttl =  options.ttl;
     this.pg = options.pg || require('pg.js');
@@ -66,7 +66,7 @@ module.exports = function (session) {
       if (err) return fn(err);
       if (!data) return fn();
       try {
-        return fn(null, ("string" == typeof data.sess) ? JSON.parse(data.sess) : data.sess);
+        return fn(null, ('string' === typeof data.sess) ? JSON.parse(data.sess) : data.sess);
       } catch(e) {
         return this.destroy(sid, fn);
       }
