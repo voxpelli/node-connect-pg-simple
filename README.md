@@ -42,7 +42,8 @@ var pg = require('pg')
 app.use(session({
   store: new pgSession({
     pg : pg,
-    conString : process.env.FOO_DATABASE_URL
+    conString : process.env.FOO_DATABASE_URL,
+    tableName : 'user_sessions'
   }),
   secret: process.env.FOO_COOKIE_SECRET,
   cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
@@ -66,8 +67,13 @@ app.use(session({
 * **pg** - Recommended. If you want the session store to use the same database module (compatible with [pg](https://www.npmjs.org/package/pg) / [pg.js](https://www.npmjs.org/package/pg.js)) as the rest of your app, then send it in here. Useful as eg. the connection pool then can be shared between the module and the rest of the application. Also useful if you want this module to use the native bindings of [pg](https://www.npmjs.org/package/pg) as this module itself only comes with [pg.js](https://www.npmjs.org/package/pg.js).
 * **ttl** - the time to live for the session in the database – specified in seconds. Defaults to the cookie maxAge if the cookie has a maxAge defined and otherwise defaults to one day.
 * **conString** - if you don't have your PostgreSQL connection string in the `DATABASE_URL` environment variable (as you do by default on eg. Heroku) – then you need to specify the connection [string or object](https://github.com/brianc/node-postgres/wiki/pg#connectstring-connectionstring-function-callback) here so that this module that create new connections. Needen even if you supply your own database module.
+* **tableName** - if your session table is named something else than `session`, then you can specify that here.
 
 ## Changelog
+
+### 2.1.0
+
+* Enable the table name to be configured through new `tableName` option
 
 ### 2.0.0
 
