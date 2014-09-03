@@ -60,9 +60,9 @@ module.exports = function (session) {
   PGStore.prototype.get = function (sid, fn) {
     // Clean up occasionly – but not always...
     if (Math.random() < 0.05) {
-      this.query('DELETE FROM ' + this.tableName + ' WHERE expire < NOW()');
+      this.query('DELETE FROM "' + this.tableName + '" WHERE expire < NOW()');
     }
-    this.query('SELECT sess FROM ' + this.tableName + ' WHERE sid = $1 AND expire >= NOW()', [sid], function (err, data) {
+    this.query('SELECT sess FROM "' + this.tableName + '" WHERE sid = $1 AND expire >= NOW()', [sid], function (err, data) {
       if (err) return fn(err);
       if (!data) return fn();
       try {
@@ -92,9 +92,9 @@ module.exports = function (session) {
         : oneDay);
     ttl += Date.now() / 1000;
 
-    this.query("UPDATE " + this.tableName + " SET sess = $1, expire = to_timestamp($2) WHERE sid = $3 RETURNING sid", [sess, ttl, sid], function (err, data) {
+    this.query('UPDATE "' + this.tableName + '" SET sess = $1, expire = to_timestamp($2) WHERE sid = $3 RETURNING sid', [sess, ttl, sid], function (err, data) {
       if (!err && data === false) {
-        self.query("INSERT INTO " + this.tableName + " (sess, expire, sid) SELECT $1, to_timestamp($2), $3 WHERE NOT EXISTS (SELECT 1 FROM session WHERE sid = $4)", [sess, ttl, sid, sid], function (err) {
+        self.query('INSERT INTO "' + this.tableName + '" (sess, expire, sid) SELECT $1, to_timestamp($2), $3 WHERE NOT EXISTS (SELECT 1 FROM session WHERE sid = $4)', [sess, ttl, sid, sid], function (err) {
           fn && fn.apply(this, err);
         });
       } else {
@@ -111,7 +111,7 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.destroy = function (sid, fn) {
-    this.query("DELETE FROM " + this.tableName + " WHERE sid = $1", [sid], function (err) {
+    this.query('DELETE FROM "' + this.tableName + '" WHERE sid = $1', [sid], function (err) {
       fn && fn(err);
     });
   };
