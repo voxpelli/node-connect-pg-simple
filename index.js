@@ -94,7 +94,7 @@ module.exports = function (session) {
 
     this.query('UPDATE "' + this.tableName + '" SET sess = $1, expire = to_timestamp($2) WHERE sid = $3 RETURNING sid', [sess, ttl, sid], function (err, data) {
       if (!err && data === false) {
-        self.query('INSERT INTO "' + this.tableName + '" (sess, expire, sid) SELECT $1, to_timestamp($2), $3 WHERE NOT EXISTS (SELECT 1 FROM session WHERE sid = $4)', [sess, ttl, sid, sid], function (err) {
+        self.query('INSERT INTO "' + self.tableName + '" (sess, expire, sid) SELECT $1, to_timestamp($2), $3 WHERE NOT EXISTS (SELECT 1 FROM "' + self.tableName + '" WHERE sid = $4)', [sess, ttl, sid, sid], function (err) {
           fn && fn.apply(this, err);
         });
       } else {
