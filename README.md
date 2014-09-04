@@ -71,6 +71,10 @@ app.use(session({
 
 ## Changelog
 
+### 2.1.1
+
+* Fix bug with creating new sessions that was caused by 2.1.0
+
 ### 2.1.0
 
 * Enable the table name to be configured through new `tableName` option
