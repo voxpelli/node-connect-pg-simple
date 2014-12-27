@@ -88,7 +88,7 @@ module.exports = function (session) {
       , ttl = this.ttl;
 
     ttl = ttl || ('number' == typeof maxAge
-        ? maxAge / 1000 | 0
+        ? maxAge | 0
         : oneDay);
     ttl += Date.now() / 1000;
 
