@@ -71,6 +71,11 @@ app.use(session({
 
 ## Changelog
 
+### 2.2.0
+
+* New: Now possibly to set another schema than the default
+* Change: Now using the `pg` dependency again rather than `pg.js` as the latter will be discontinued as `pg` now fills its role
+
 ### 2.1.1
 
 * Fix bug with creating new sessions that was caused by 2.1.0
