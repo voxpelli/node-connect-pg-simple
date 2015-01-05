@@ -37,10 +37,10 @@ module.exports = function (session) {
   /**
    * Query the database.
    *
-   * @param {String} query
-   * @param {Array} params
-   * @param {Function} fn
-   * @api public
+   * @param {String} query - the database query to perform
+   * @param {(Array|Function)} [params] - the parameters of the query or the callback function
+   * @param {Function} [fn] - standard Node.js callback returning the resulting rows
+   * @access private
    */
 
   PGStore.prototype.query = function (query, params, fn) {
@@ -63,9 +63,9 @@ module.exports = function (session) {
   /**
    * Attempt to fetch session by the given `sid`.
    *
-   * @param {String} sid
-   * @param {Function} fn
-   * @api public
+   * @param {String} sid – the session id
+   * @param {Function} fn – a standard Node.js callback returning the parsed session object
+   * @access public
    */
 
   PGStore.prototype.get = function (sid, fn) {
@@ -87,10 +87,10 @@ module.exports = function (session) {
   /**
    * Commit the given `sess` object associated with the given `sid`.
    *
-   * @param {String} sid
-   * @param {Session} sess
-   * @param {Function} fn
-   * @api public
+   * @param {String} sid – the session id
+   * @param {Object} sess – the session object to store
+   * @param {Function} fn – a standard Node.js callback returning the parsed session object
+   * @access public
    */
 
   PGStore.prototype.set = function (sid, sess, fn) {
@@ -117,8 +117,8 @@ module.exports = function (session) {
   /**
    * Destroy the session associated with the given `sid`.
    *
-   * @param {String} sid
-   * @api public
+   * @param {String} sid – the session id
+   * @access public
    */
 
   PGStore.prototype.destroy = function (sid, fn) {
