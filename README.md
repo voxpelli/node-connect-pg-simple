@@ -72,6 +72,10 @@ app.use(session({
 
 ## Changelog
 
+### 2.2.1
+
+* Hotfix: Update `require('pg')` to match package.json, thanks for reporting @dmitriiabramov
+
 ### 2.2.0
 
 * New: Now possibly to set another schema than the default
