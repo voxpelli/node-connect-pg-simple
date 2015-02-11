@@ -4,7 +4,7 @@ module.exports = function (session) {
 
   var Store = session.Store
     , PGStore
-    , lastExpiryCheck = null;
+    , lastExpiryCheck = 0;
 
   PGStore = function (options) {
     options = options || {};
@@ -18,7 +18,7 @@ module.exports = function (session) {
     this.pg = options.pg || require('pg');
 
     this.expiryMethod = options.expiryMethod || "random";
-    this.randomFactor = options.randomFactor || 0.5;
+    this.randomExpiryFactor = options.randomExpiryFactor || 0.5;
     this.timedExpiryDelay = options.timedExpiryDelay || 60;
   };
 
@@ -81,8 +81,8 @@ module.exports = function (session) {
       // for timed check, we only do the request based on a delay of the last check
       doExpiryCheck = Date.now() >= lastExpiryCheck + this.timedExpiryDelay * 1000;
     }else {
-      // Random check is based on request frequency and randomFactor (more requests and/or high factor means more checks)
-      doExpiryCheck = Math.random() <= this.randomFactor;
+      // Random check is based on request frequency and randomExpiryFactor (more requests and/or high factor means more checks)
+      doExpiryCheck = Math.random() <= this.randomExpiryFactor;
     }
 
     if (doExpiryCheck){
@@ -116,8 +116,8 @@ module.exports = function (session) {
       , ttl = this.ttl;
 
     ttl = ttl || ('number' == typeof maxAge
-        ? maxAge / 1000 | 0
-        : oneDay);
+      ? maxAge / 1000 | 0
+      : oneDay);
     ttl += Date.now() / 1000;
 
     this.query('UPDATE ' + this.quotedTable() + ' SET sess = $1, expire = to_timestamp($2) WHERE sid = $3 RETURNING sid', [sess, ttl, sid], function (err, data) {
