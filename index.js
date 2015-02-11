@@ -3,7 +3,8 @@ var oneDay = 86400;
 module.exports = function (session) {
 
   var Store = session.Store
-    , PGStore;
+    , PGStore
+    , lastExpiryCheck = null;
 
   PGStore = function (options) {
     options = options || {};
@@ -15,6 +16,10 @@ module.exports = function (session) {
     this.conString = options.conString || process.env.DATABASE_URL;
     this.ttl =  options.ttl;
     this.pg = options.pg || require('pg');
+
+    this.expiryMethod = options.expiryMethod || "random";
+    this.randomFactor = options.randomFactor || 0.5;
+    this.timedExpiryDelay = options.timedExpiryDelay || 60;
   };
 
   /**
@@ -69,10 +74,22 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.get = function (sid, fn) {
-    // Clean up occasionly – but not always...
-    if (Math.random() < 0.05) {
+    var doExpiryCheck = false
+      , now = null;
+
+    if (this.expiryMethod === "timed" ){
+      // for timed check, we only do the request based on a delay of the last check
+      doExpiryCheck = Date.now() >= lastExpiryCheck + this.timedExpiryDelay * 1000;
+    }else {
+      // Random check is based on request frequency and randomFactor (more requests and/or high factor means more checks)
+      doExpiryCheck = Math.random() <= this.randomFactor;
+    }
+
+    if (doExpiryCheck){
+      lastExpiryCheck = Date.now();
       this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < NOW()');
     }
+
     this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= NOW()', [sid], function (err, data) {
       if (err) return fn(err);
       if (!data) return fn();

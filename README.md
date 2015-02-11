@@ -69,6 +69,9 @@ app.use(session({
 * **conString** - if you don't have your PostgreSQL connection string in the `DATABASE_URL` environment variable (as you do by default on eg. Heroku) – then you need to specify the connection [string or object](https://github.com/brianc/node-postgres/wiki/pg#connectstring-connectionstring-function-callback) here so that this module that create new connections. Needen even if you supply your own database module.
 * **schemaName** - if your session table is in another Postgres schema than the default (it normally isn't), then you can specify that here.
 * **tableName** - if your session table is named something else than `session`, then you can specify that here.
+* **expiryMethod** - defines how the checks for expired session will be made. defaults to `random` can also be `timed`.
+* **randomFactor** - used along with  `expiryMethod : "random"`. May be Any floating number between 0 and 1. A value of 0.8 means the expiry cleanup will run on 80% (or so) of the requests.
+* **timedExpiryDelay** - used along with  `expiryMethod : "timed"`. Sets a minimum delay in seconds at which the expiry check will run. Each time a request is made, the `last execution time` + `timedExpiryDelay` will decide if expiry check runs.
 
 ## Changelog
 
