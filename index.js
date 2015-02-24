@@ -6,7 +6,7 @@ module.exports = function (session) {
     , PGStore;
 
   PGStore = function (options) {
-    var _this = this;
+    var self = this;
 
     options = options || {};
     Store.call(this, options);
@@ -24,7 +24,7 @@ module.exports = function (session) {
     this.pruneSessions(); // clean on instanciation
 
     setInterval(function(){
-      _this.pruneSessions();
+      self.pruneSessions();
     },this.pruneSessionInterval);
   };
 
@@ -40,16 +40,15 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.pruneSessions = function(){
+    var self = this;
     if (!this.isPruningSessions){
       this.isPruningSessions = true;
       this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < NOW()',function(err){
-
+        self.isPruningSessions = false;
         if (err){
           console.warn ("failed to prune sessions");
           console.log(err);
         }
-
-        this.isPruningSessions = false;
       });
     }else{
       console.warn ("Session pruning is already running. You might want to check isPruningSessions before calling pruneSessions(), or increase 'pruneSessionInterval' to avoid concurrent executions.");
