@@ -3,10 +3,11 @@ var oneDay = 86400;
 module.exports = function (session) {
 
   var Store = session.Store
-    , PGStore
-    , lastExpiryCheck = 0;
+    , PGStore;
 
   PGStore = function (options) {
+    var _this = this;
+
     options = options || {};
     Store.call(this, options);
 
@@ -17,9 +18,14 @@ module.exports = function (session) {
     this.ttl =  options.ttl;
     this.pg = options.pg || require('pg');
 
-    this.expiryMethod = options.expiryMethod || "random";
-    this.randomExpiryFactor = options.randomExpiryFactor || 0.5;
-    this.timedExpiryDelay = options.timedExpiryDelay || 60;
+    this.pruneSessionInterval = (options.pruneSessionInterval || 60) * 1000;
+    this.isPruningSessions = false;
+
+    this.pruneSessions(); // clean on instanciation
+
+    setInterval(function(){
+      _this.pruneSessions();
+    },this.pruneSessionInterval);
   };
 
   /**
@@ -27,6 +33,31 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.__proto__ = Store.prototype;
+
+
+  /**
+   * Does garbage collection for expired session in the database
+   */
+
+  PGStore.prototype.pruneSessions = function(){
+    if (!this.isPruningSessions){
+      this.isPruningSessions = true;
+      this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < NOW()',function(err){
+
+        if (err){
+          console.warn ("failed to prune sessions");
+          console.log(err);
+        }else{
+          console.log("prune session done");
+          console.log(arguments[1]);
+        }
+
+        this.isPruningSessions = false;
+      });
+    }else{
+      console.warn ("Session pruning is already running. You might want to check isPruningSessions before calling pruneSessions(), or increase 'pruneSessionInterval' to avoid concurrent executions.");
+    }
+  };
 
   /**
    * Get the quoted table.
@@ -74,21 +105,6 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.get = function (sid, fn) {
-    var doExpiryCheck = false
-      , now = null;
-
-    if (this.expiryMethod === "timed" ){
-      // for timed check, we only do the request based on a delay of the last check
-      doExpiryCheck = Date.now() >= lastExpiryCheck + this.timedExpiryDelay * 1000;
-    }else {
-      // Random check is based on request frequency and randomExpiryFactor (more requests and/or high factor means more checks)
-      doExpiryCheck = Math.random() <= this.randomExpiryFactor;
-    }
-
-    if (doExpiryCheck){
-      lastExpiryCheck = Date.now();
-      this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < NOW()');
-    }
 
     this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= NOW()', [sid], function (err, data) {
       if (err) return fn(err);
