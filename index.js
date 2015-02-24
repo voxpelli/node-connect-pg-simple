@@ -47,9 +47,6 @@ module.exports = function (session) {
         if (err){
           console.warn ("failed to prune sessions");
           console.log(err);
-        }else{
-          console.log("prune session done");
-          console.log(arguments[1]);
         }
 
         this.isPruningSessions = false;
