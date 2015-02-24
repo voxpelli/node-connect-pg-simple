@@ -6,6 +6,8 @@ module.exports = function (session) {
     , PGStore;
 
   PGStore = function (options) {
+    var self = this;
+
     options = options || {};
     Store.call(this, options);
 
@@ -15,6 +17,15 @@ module.exports = function (session) {
     this.conString = options.conString || process.env.DATABASE_URL;
     this.ttl =  options.ttl;
     this.pg = options.pg || require('pg');
+
+    this.pruneSessionInterval = (options.pruneSessionInterval || 60) * 1000;
+    this.isPruningSessions = false;
+
+    this.pruneSessions(); // clean on instanciation
+
+    setInterval(function(){
+      self.pruneSessions();
+    },this.pruneSessionInterval);
   };
 
   /**
@@ -22,6 +33,27 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.__proto__ = Store.prototype;
+
+
+  /**
+   * Does garbage collection for expired session in the database
+   */
+
+  PGStore.prototype.pruneSessions = function(){
+    var self = this;
+    if (!this.isPruningSessions){
+      this.isPruningSessions = true;
+      this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < NOW()',function(err){
+        self.isPruningSessions = false;
+        if (err){
+          console.warn ("failed to prune sessions");
+          console.log(err);
+        }
+      });
+    }else{
+      console.warn ("Session pruning is already running. You might want to check isPruningSessions before calling pruneSessions(), or increase 'pruneSessionInterval' to avoid concurrent executions.");
+    }
+  };
 
   /**
    * Get the quoted table.
@@ -69,10 +101,7 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.get = function (sid, fn) {
-    // Clean up occasionly – but not always...
-    if (Math.random() < 0.05) {
-      this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < NOW()');
-    }
+
     this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= NOW()', [sid], function (err, data) {
       if (err) return fn(err);
       if (!data) return fn();
@@ -99,8 +128,8 @@ module.exports = function (session) {
       , ttl = this.ttl;
 
     ttl = ttl || ('number' == typeof maxAge
-        ? maxAge / 1000 | 0
-        : oneDay);
+      ? maxAge / 1000 | 0
+      : oneDay);
     ttl += Date.now() / 1000;
 
     this.query('UPDATE ' + this.quotedTable() + ' SET sess = $1, expire = to_timestamp($2) WHERE sid = $3 RETURNING sid', [sess, ttl, sid], function (err, data) {
