@@ -11,8 +11,6 @@ module.exports = function (session) {
     PGStore;
 
   PGStore = function (options) {
-    var self = this;
-
     options = options || {};
     Store.call(this, options);
 
@@ -28,9 +26,7 @@ module.exports = function (session) {
 
     this.pruneSessions(); // clean on instanciation
 
-    setInterval(function(){
-      self.pruneSessions();
-    },this.pruneSessionInterval);
+    setInterval(this.pruneSessions.bind(this), this.pruneSessionInterval);
   };
 
   /**
@@ -44,19 +40,18 @@ module.exports = function (session) {
    * Does garbage collection for expired session in the database
    */
 
-  PGStore.prototype.pruneSessions = function(){
-    var self = this;
-    if (!this.isPruningSessions){
+  PGStore.prototype.pruneSessions = function () {
+    if (!this.isPruningSessions) {
       this.isPruningSessions = true;
-      this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < NOW()',function(err){
-        self.isPruningSessions = false;
+      this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < NOW()', function (err) {
+        this.isPruningSessions = false;
         if (err){
-          console.warn ("failed to prune sessions");
+          console.warn('failed to prune sessions');
           console.log(err);
         }
-      });
-    }else{
-      console.warn ("Session pruning is already running. You might want to check isPruningSessions before calling pruneSessions(), or increase 'pruneSessionInterval' to avoid concurrent executions.");
+      }.bind(this));
+    } else {
+      console.warn('Session pruning is already running. You might want to check isPruningSessions before calling pruneSessions(), or increase \'pruneSessionInterval\' to avoid concurrent executions.');
     }
   };
 
@@ -112,7 +107,6 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.get = function (sid, fn) {
-
     this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= NOW()', [sid], function (err, data) {
       if (err) { return fn(err); }
       if (!data) { return fn(); }
