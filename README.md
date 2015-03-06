@@ -72,6 +72,10 @@ app.use(session({
 
 ## Changelog
 
+### 2.3.0
+
+* Backwards compatibility: No longer defaults to a `public` schema, as was done in `2.2.0`, but rather defaults to pre-2.2.0 behavior to restor backwards compatibility with `2.x` version as required by Semamtic Versioning
+
 ### 2.2.1
 
 * Hotfix: Update `require('pg')` to match package.json, thanks for reporting @dmitriiabramov

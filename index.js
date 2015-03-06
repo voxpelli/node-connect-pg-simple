@@ -14,7 +14,7 @@ module.exports = function (session) {
     options = options || {};
     Store.call(this, options);
 
-    this.schemaName = options.schemaName || 'public';
+    this.schemaName = options.schemaName || null;
     this.tableName = options.tableName || 'session';
 
     this.conString = options.conString || process.env.DATABASE_URL;
@@ -36,7 +36,13 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.quotedTable = function () {
-    return '"' + this.schemaName + '"."' + this.tableName + '"';
+    var result = '"' + this.tableName + '"';
+
+    if (this.schemaName) {
+      result = '"' + this.schemaName + '".' + result;
+    }
+
+    return result;
   };
 
   /**
