@@ -69,7 +69,12 @@ app.use(session({
 * **conString** - if you don't have your PostgreSQL connection string in the `DATABASE_URL` environment variable (as you do by default on eg. Heroku) – then you need to specify the connection [string or object](https://github.com/brianc/node-postgres/wiki/pg#connectstring-connectionstring-function-callback) here so that this module that create new connections. Needen even if you supply your own database module.
 * **schemaName** - if your session table is in another Postgres schema than the default (it normally isn't), then you can specify that here.
 * **tableName** - if your session table is named something else than `session`, then you can specify that here.
-* **pruneSessionInterval** - Sets the delay in seconds at which expired sessions are pruned from the database. Default is 60 seconds.
+* **pruneSessionInterval** - Sets the delay in seconds at which expired sessions are pruned from the database. Default is 60 seconds. If set to a falsy value no automatic pruning will happen.
+* **errorLog** – the method used to log errors in those cases where an error can't be returned to a callback. Defaults to `console.error()`, but can be useful to override if one eg. uses [Bunyan](https://github.com/trentm/node-bunyan) for logging.
+
+## Useful methods
+
+* **pruneSessions([callback(err)])** – will prune old sessions. Only really needed to be called if **pruneSessionInterval** has been set to a falsy value which one can do if one eg. wants a more advanced pruning interval mechanism.
 
 ## Changelog
 

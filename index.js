@@ -21,12 +21,14 @@ module.exports = function (session) {
     this.ttl =  options.ttl;
     this.pg = options.pg || require('pg');
 
-    this.pruneSessionInterval = (options.pruneSessionInterval || 60) * 1000;
-    this.isPruningSessions = false;
+    this.errorLog = options.errorLog || console.error.bind(console);
 
-    this.pruneSessions(); // clean on instanciation
-
-    setInterval(this.pruneSessions.bind(this), this.pruneSessionInterval);
+    if (options.pruneSessionInterval === false) {
+      this.pruneSessionInterval = false;
+    } else {
+      this.pruneSessionInterval = (options.pruneSessionInterval || 60) * 1000;
+      this.pruneSessions(true);
+    }
   };
 
   /**
@@ -35,24 +37,24 @@ module.exports = function (session) {
 
   util.inherits(PGStore, Store);
 
-
   /**
    * Does garbage collection for expired session in the database
    */
 
-  PGStore.prototype.pruneSessions = function () {
-    if (!this.isPruningSessions) {
-      this.isPruningSessions = true;
-      this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < NOW()', function (err) {
-        this.isPruningSessions = false;
-        if (err){
-          console.warn('failed to prune sessions');
-          console.log(err);
-        }
-      }.bind(this));
-    } else {
-      console.warn('Session pruning is already running. You might want to check isPruningSessions before calling pruneSessions(), or increase \'pruneSessionInterval\' to avoid concurrent executions.');
-    }
+  PGStore.prototype.pruneSessions = function (fn) {
+    this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < NOW()', function (err) {
+      if (fn && typeof fn === 'function') {
+        return fn(err);
+      }
+
+      if (err) {
+        this.errorLog('Failed to prune sessions:', err.message);
+      }
+
+      if (fn === true) {
+        setTimeout(this.pruneSessions.bind(this, true), this.pruneSessionInterval);
+      }
+    }.bind(this));
   };
 
   /**
