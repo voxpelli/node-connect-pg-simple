@@ -19,5 +19,17 @@
   "engines": {
     "node": "0.10.x"
   },
-  "main": "index.js"
+  "main": "index.js",
+  "scripts": {
+    "test": "node -e \"require('grunt').tasks(['test']);\"",
+    "test-all": "node -e \"require('grunt').tasks(['test-all']);\"",
+    "prepush": "npm test"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "husky": "^0.6.2",
+    "istanbul": "^0.3.7",
+    "lintlovin": "^1.14.0",
+    "mocha": "^2.1.0"
+  }
 }

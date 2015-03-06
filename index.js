@@ -1,9 +1,14 @@
+/*jslint node: true */
+
+'use strict';
+
+var util = require('util');
 var oneDay = 86400;
 
 module.exports = function (session) {
 
-  var Store = session.Store
-    , PGStore;
+  var Store = session.Store,
+    PGStore;
 
   PGStore = function (options) {
     options = options || {};
@@ -21,7 +26,7 @@ module.exports = function (session) {
    * Inherit from `Store`.
    */
 
-  PGStore.prototype.__proto__ = Store.prototype;
+  util.inherits(PGStore, Store);
 
   /**
    * Get the quoted table.
@@ -50,11 +55,11 @@ module.exports = function (session) {
     this.pg.connect(this.conString, function (err, client, done) {
       if (err) {
         done(client);
-        fn && fn(err);
+        if (fn) { fn(err); }
       } else {
         client.query(query, params || [], function (err, result) {
           done(err || false);
-          fn && fn(err, result && result.rows[0] ? result.rows[0] : false);
+          if (fn) { fn(err, result && result.rows[0] ? result.rows[0] : false); }
         });
       }
     });
@@ -74,11 +79,11 @@ module.exports = function (session) {
       this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < NOW()');
     }
     this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= NOW()', [sid], function (err, data) {
-      if (err) return fn(err);
-      if (!data) return fn();
+      if (err) { return fn(err); }
+      if (!data) { return fn(); }
       try {
         return fn(null, ('string' === typeof data.sess) ? JSON.parse(data.sess) : data.sess);
-      } catch(e) {
+      } catch (e) {
         return this.destroy(sid, fn);
       }
     }.bind(this));
@@ -94,22 +99,20 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.set = function (sid, sess, fn) {
-    var self = this
-      , maxAge = sess.cookie.maxAge
-      , ttl = this.ttl;
+    var self = this,
+      maxAge = sess.cookie.maxAge,
+      ttl = this.ttl;
 
-    ttl = ttl || ('number' == typeof maxAge
-        ? maxAge / 1000 | 0
-        : oneDay);
-    ttl += Date.now() / 1000;
+    ttl = ttl || (typeof maxAge === 'number' ? maxAge / 1000 : oneDay);
+    ttl = Math.ceil(ttl + Date.now() / 1000);
 
     this.query('UPDATE ' + this.quotedTable() + ' SET sess = $1, expire = to_timestamp($2) WHERE sid = $3 RETURNING sid', [sess, ttl, sid], function (err, data) {
       if (!err && data === false) {
         self.query('INSERT INTO ' + self.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 WHERE NOT EXISTS (SELECT 1 FROM ' + self.quotedTable() + ' WHERE sid = $4)', [sess, ttl, sid, sid], function (err) {
-          fn && fn.apply(this, err);
+          if (fn) { fn.apply(this, err); }
         });
       } else {
-        fn && fn.apply(this, err);
+        if (fn) { fn.apply(this, err); }
       }
     });
   };
@@ -123,7 +126,7 @@ module.exports = function (session) {
 
   PGStore.prototype.destroy = function (sid, fn) {
     this.query('DELETE FROM ' + this.quotedTable() + ' WHERE sid = $1', [sid], function (err) {
-      fn && fn(err);
+      if (fn) { fn(err); }
     });
   };
 
