@@ -1,6 +1,6 @@
 {
   "name": "connect-pg-simple",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "description": "A simple, minimal PostgreSQL session store for Connect/Express",
   "url": "http://github.com/voxpelli/node-connect-pg-simple",
   "repository": {
@@ -32,6 +32,7 @@
     "istanbul": "^0.3.7",
     "lintlovin": "^1.14.0",
     "mocha": "^2.1.0",
+    "promise": "^6.1.0",
     "sinon": "^1.13.0"
   }
 }

@@ -27,7 +27,9 @@ module.exports = function (session) {
       this.pruneSessionInterval = false;
     } else {
       this.pruneSessionInterval = (options.pruneSessionInterval || 60) * 1000;
-      this.pruneSessions(true);
+      setImmediate(function () {
+        this.pruneSessions();
+      }.bind(this));
     }
   };
 
@@ -38,7 +40,27 @@ module.exports = function (session) {
   util.inherits(PGStore, Store);
 
   /**
+   * Closes the session store
+   *
+   * Currently only stops the automatic pruning, if any, from continuing
+   *
+   * @access public
+   */
+
+  PGStore.prototype.close = function () {
+    this.closed = true;
+
+    if (this.pruneTimer) {
+      clearTimeout(this.pruneTimer);
+      this.pruneTimer = undefined;
+    }
+  };
+
+  /**
    * Does garbage collection for expired session in the database
+   *
+   * @param {Function} [fn] - standard Node.js callback called on completion
+   * @access public
    */
 
   PGStore.prototype.pruneSessions = function (fn) {
@@ -51,8 +73,11 @@ module.exports = function (session) {
         this.errorLog('Failed to prune sessions:', err.message);
       }
 
-      if (fn === true) {
-        setTimeout(this.pruneSessions.bind(this, true), this.pruneSessionInterval);
+      if (this.pruneSessionInterval && !this.closed) {
+        if (this.pruneTimer) {
+          clearTimeout(this.pruneTimer);
+        }
+        this.pruneTimer = setTimeout(this.pruneSessions.bind(this, true), this.pruneSessionInterval);
       }
     }.bind(this));
   };

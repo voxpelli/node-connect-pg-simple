@@ -69,14 +69,20 @@ app.use(session({
 * **conString** - if you don't have your PostgreSQL connection string in the `DATABASE_URL` environment variable (as you do by default on eg. Heroku) – then you need to specify the connection [string or object](https://github.com/brianc/node-postgres/wiki/pg#connectstring-connectionstring-function-callback) here so that this module that create new connections. Needen even if you supply your own database module.
 * **schemaName** - if your session table is in another Postgres schema than the default (it normally isn't), then you can specify that here.
 * **tableName** - if your session table is named something else than `session`, then you can specify that here.
-* **pruneSessionInterval** - Sets the delay in seconds at which expired sessions are pruned from the database. Default is 60 seconds. If set to a falsy value no automatic pruning will happen.
+* **pruneSessionInterval** - sets the delay in seconds at which expired sessions are pruned from the database. Default is `60` seconds. If set to `false` no automatic pruning will happen. Automatic pruning weill happen `pruneSessionInterval` seconds after the last pruning – manual or automatic.
 * **errorLog** – the method used to log errors in those cases where an error can't be returned to a callback. Defaults to `console.error()`, but can be useful to override if one eg. uses [Bunyan](https://github.com/trentm/node-bunyan) for logging.
 
 ## Useful methods
 
-* **pruneSessions([callback(err)])** – will prune old sessions. Only really needed to be called if **pruneSessionInterval** has been set to a falsy value which one can do if one eg. wants a more advanced pruning interval mechanism.
+* **close()** – if automatic interval pruning is on, which it is by default as of `3.0.0`, then the timers will block any graceful shutdown unless you tell the automatic pruning to stop by closing the session handler using this method.
+* **pruneSessions([callback(err)])** – will prune old sessions. Only really needed to be called if **pruneSessionInterval** has been set to `false` – which can be useful if one wants improved control of the pruning.
 
 ## Changelog
+
+### 3.0.0
+
+* Improvement: Rather than randomly cleaning up expired sessions that will now happen at the `options.pruneSessionInterval` defined interval.
+* Breaking change: Clients now need to close the session store to gracefully shut down their app as the pruning of sessions can't know when the rest of the app has stopped running and thus can't know when to stop pruning sessions if it itsn't told so explicitly through thew new `close()` method – or by deactivating the automatic pruning by settinging `options.pruneSessionInterval` to `false`. If automatic pruning is disabled the client needs to call `pruneSessions()` manually or otherwise ensure that old sessions are pruned.
 
 ### 2.3.0
 
