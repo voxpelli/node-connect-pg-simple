@@ -74,7 +74,7 @@ app.use(session({
 
 ### 2.3.0
 
-* Backwards compatibility: No longer defaults to a `public` schema, as was done in `2.2.0`, but rather defaults to pre-2.2.0 behavior to restor backwards compatibility with `2.x` version as required by Semamtic Versioning
+* Fix regression: No longer default to `public` schema, as added in `2.2.0`, but rather default to the pre-`2.2.0` behavior of no defined schema. This to ensure backwards compatibility with the `2.x` branch, per semantic versioning best practise.
 
 ### 2.2.1
 
