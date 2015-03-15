@@ -27,10 +27,11 @@
   },
   "devDependencies": {
     "chai": "^2.1.1",
+    "coveralls": "^2.11.2",
     "grunt": "^0.4.5",
-    "husky": "^0.6.2",
+    "husky": "^0.7.0",
     "istanbul": "^0.3.7",
-    "lintlovin": "^1.14.0",
+    "lintlovin": "^1.15.0",
     "mocha": "^2.1.0",
     "promise": "^6.1.0",
     "sinon": "^1.13.0"
