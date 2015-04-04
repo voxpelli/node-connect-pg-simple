@@ -20,6 +20,7 @@ module.exports = function (session) {
     this.conString = options.conString || process.env.DATABASE_URL;
     this.ttl =  options.ttl;
     this.pg = options.pg || require('pg');
+    this.ownsPg = !options.pg;
 
     this.errorLog = options.errorLog || console.error.bind(console);
 
@@ -53,6 +54,10 @@ module.exports = function (session) {
     if (this.pruneTimer) {
       clearTimeout(this.pruneTimer);
       this.pruneTimer = undefined;
+    }
+
+    if (this.ownsPg) {
+      this.pg.end();
     }
   };
 
