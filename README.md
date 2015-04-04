@@ -83,6 +83,10 @@ app.use(session({
 
 ## Changelog
 
+### 3.0.1
+
+* Fix: If the `pg` instance used is created by this module, then this module should also close it on `close()`
+
 ### 3.0.0
 
 * Improvement: Rather than randomly cleaning up expired sessions that will now happen at the `options.pruneSessionInterval` defined interval.
