@@ -24,7 +24,7 @@ Or simply play the file via a GUI, like the pgAdminIII queries tool.
 
 Examples are based on Express 4.
 
-Simple:
+Simple example:
 
 ```javascript
 var session = require('express-session');
@@ -36,7 +36,7 @@ app.use(session({
 }));
 ```
 
-Advanced:
+Advanced example showing some custom options:
 
 ```javascript
 var pg = require('pg')
@@ -45,9 +45,9 @@ var pg = require('pg')
 
 app.use(session({
   store: new pgSession({
-    pg : pg,
-    conString : process.env.FOO_DATABASE_URL,
-    tableName : 'user_sessions'
+    pg : pg,                                  // Use global pg-module
+    conString : process.env.FOO_DATABASE_URL, // Connect using something else than default DATABASE_URL env variable
+    tableName : 'user_sessions'               // Use another table-name than the default "session" one
   }),
   secret: process.env.FOO_COOKIE_SECRET,
   cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
