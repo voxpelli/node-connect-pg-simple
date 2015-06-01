@@ -7,7 +7,7 @@ var oneDay = 86400;
 
 module.exports = function (session) {
 
-  var Store = session.Store,
+  var Store = session.Store || session.session.Store,
     PGStore;
 
   PGStore = function (options) {
