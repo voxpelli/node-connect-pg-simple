@@ -83,6 +83,10 @@ app.use(session({
 
 ## Changelog
 
+### 3.0.2
+
+* Fix: Added support for [sails](http://sailsjs.org/) by supporting sending the full Express 3 object into the plugin
+
 ### 3.0.1
 
 * Fix: If the `pg` instance used is created by this module, then this module should also close it on `close()`
