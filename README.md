@@ -83,6 +83,10 @@ app.use(session({
 
 ## Changelog
 
+### Next
+
+* Fix: Relax the engine requirements – accept newer versions of Node.js/iojs as well
+
 ### 3.0.2
 
 * Fix: Added support for [sails](http://sailsjs.org/) by supporting sending the full Express 3 object into the plugin
