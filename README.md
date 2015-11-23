@@ -32,6 +32,7 @@ var session = require('express-session');
 app.use(session({
   store: new (require('connect-pg-simple')(session))(),
   secret: process.env.FOO_COOKIE_SECRET,
+  resave: false,
   cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
 }));
 ```
@@ -50,6 +51,7 @@ app.use(session({
     tableName : 'user_sessions'               // Use another table-name than the default "session" one
   }),
   secret: process.env.FOO_COOKIE_SECRET,
+  resave: false,
   cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
 }));
 ```
@@ -83,8 +85,9 @@ app.use(session({
 
 ## Changelog
 
-### Next
+### 3.1.0
 
+* Feature: Support the `store.touch()` method to allow for extending the life time of a session without changing the data of it. This enables setting the `resave` option to `false`, which is recommended to avoid a session extender save overwriting another save that adds new data to the session. More info in the [express-session readme](https://github.com/expressjs/session#resave).
 * Fix: Relax the engine requirements – accept newer versions of Node.js/iojs as well
 
 ### 3.0.2
