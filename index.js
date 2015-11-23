@@ -105,6 +105,23 @@ module.exports = function (session) {
   };
 
   /**
+   * Figure out when a session should expire
+   *
+   * @param {Number} [maxAge] - the maximum age of the session cookie
+   * @return {Number} the unix timestamp, in seconds
+   * @access private
+   */
+
+  PGStore.prototype.getExpireTime = function (maxAge) {
+    var ttl = this.ttl;
+
+    ttl = ttl || (typeof maxAge === 'number' ? maxAge / 1000 : oneDay);
+    ttl = Math.ceil(ttl + Date.now() / 1000);
+
+    return ttl;
+  };
+
+  /**
    * Query the database.
    *
    * @param {String} query - the database query to perform
@@ -160,16 +177,15 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.set = function (sid, sess, fn) {
-    var self = this,
-      maxAge = sess.cookie.maxAge,
-      ttl = this.ttl;
+    var self = this;
+    var expireTime = this.getExpireTime(sess.cookie.maxAge);
+    var query = 'UPDATE ' + this.quotedTable() + ' SET sess = $1, expire = to_timestamp($2) WHERE sid = $3 RETURNING sid';
 
-    ttl = ttl || (typeof maxAge === 'number' ? maxAge / 1000 : oneDay);
-    ttl = Math.ceil(ttl + Date.now() / 1000);
-
-    this.query('UPDATE ' + this.quotedTable() + ' SET sess = $1, expire = to_timestamp($2) WHERE sid = $3 RETURNING sid', [sess, ttl, sid], function (err, data) {
+    this.query(query, [sess, expireTime, sid], function (err, data) {
       if (!err && data === false) {
-        self.query('INSERT INTO ' + self.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 WHERE NOT EXISTS (SELECT 1 FROM ' + self.quotedTable() + ' WHERE sid = $4)', [sess, ttl, sid, sid], function (err) {
+        query = 'INSERT INTO ' + self.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 WHERE NOT EXISTS (SELECT 1 FROM ' + self.quotedTable() + ' WHERE sid = $4)';
+
+        self.query(query, [sess, expireTime, sid, sid], function (err) {
           if (fn) { fn.apply(this, err); }
         });
       } else {
@@ -189,6 +205,25 @@ module.exports = function (session) {
     this.query('DELETE FROM ' + this.quotedTable() + ' WHERE sid = $1', [sid], function (err) {
       if (fn) { fn(err); }
     });
+  };
+
+  /**
+   * Touch the given session object associated with the given session ID.
+   *
+   * @param {String} sid – the session id
+   * @param {Object} sess – the session object to store
+   * @param {Function} fn – a standard Node.js callback returning the parsed session object
+   * @access public
+   */
+
+  PGStore.prototype.touch = function (sid, sess, fn) {
+    var expireTime = this.getExpireTime(sess.cookie.maxAge);
+
+    this.query(
+      'UPDATE ' + this.quotedTable() + ' SET expire = to_timestamp($1) WHERE sid = $2 RETURNING sid',
+      [expireTime, sid],
+      function (err) { fn(err); }
+    );
   };
 
   return PGStore;
