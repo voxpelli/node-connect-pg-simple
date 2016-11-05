@@ -1,8 +1,8 @@
 'use strict';
 
-var chai = require('chai');
-var sinon = require('sinon');
-var Promise = require('promise');
+const chai = require('chai');
+const sinon = require('sinon');
+const Promise = require('promise');
 
 chai.should();
 
@@ -23,7 +23,7 @@ describe('PGStore', function () {
   });
 
   describe('pruneSessions', function () {
-    var fakeClock;
+    let fakeClock;
 
     beforeEach(function () {
       fakeClock = sinon.useFakeTimers();
@@ -32,11 +32,11 @@ describe('PGStore', function () {
     it('should by default run on interval and close', function () {
       options.pruneSessionInterval = undefined;
 
-      var store = new PGStore(options);
+      const store = new PGStore(options);
 
       sinon.spy(store, 'pruneSessions');
 
-      var mock = sinon.mock(store);
+      const mock = sinon.mock(store);
 
       mock.expects('query').twice().yields();
 
@@ -62,11 +62,11 @@ describe('PGStore', function () {
     it('should run on configurable interval', function () {
       options.pruneSessionInterval = 1;
 
-      var store = new PGStore(options);
+      const store = new PGStore(options);
 
       sinon.spy(store, 'pruneSessions');
 
-      var mock = sinon.mock(store);
+      const mock = sinon.mock(store);
 
       mock.expects('query').twice().yields();
 
@@ -86,11 +86,11 @@ describe('PGStore', function () {
     });
 
     it('should not run when interval is disabled', function () {
-      var store = new PGStore(options);
+      const store = new PGStore(options);
 
       sinon.spy(store, 'pruneSessions');
 
-      var mock = sinon.mock(store);
+      const mock = sinon.mock(store);
 
       mock.expects('query').never().yields();
 
