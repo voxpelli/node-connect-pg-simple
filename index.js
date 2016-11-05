@@ -5,6 +5,10 @@
 var util = require('util');
 var oneDay = 86400;
 
+var currentTimestamp = function () {
+  return Math.ceil(Date.now() / 1000);
+};
+
 module.exports = function (session) {
 
   var Store = session.Store || session.session.Store,
@@ -69,7 +73,7 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.pruneSessions = function (fn) {
-    this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < NOW()', function (err) {
+    this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < $1', [currentTimestamp()], function (err) {
       if (fn && typeof fn === 'function') {
         return fn(err);
       }
@@ -116,7 +120,7 @@ module.exports = function (session) {
     var ttl = this.ttl;
 
     ttl = ttl || (typeof maxAge === 'number' ? maxAge / 1000 : oneDay);
-    ttl = Math.ceil(ttl + Date.now() / 1000);
+    ttl = Math.ceil(ttl + currentTimestamp());
 
     return ttl;
   };
@@ -157,7 +161,7 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.get = function (sid, fn) {
-    this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= NOW()', [sid], function (err, data) {
+    this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= $2', [sid, currentTimestamp()], function (err, data) {
       if (err) { return fn(err); }
       if (!data) { return fn(); }
       try {
