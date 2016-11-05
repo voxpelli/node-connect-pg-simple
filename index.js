@@ -73,7 +73,7 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.pruneSessions = function (fn) {
-    this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < $1', [currentTimestamp()], function (err) {
+    this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < to_timestamp($1)', [currentTimestamp()], function (err) {
       if (fn && typeof fn === 'function') {
         return fn(err);
       }
@@ -161,7 +161,7 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.get = function (sid, fn) {
-    this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= $2', [sid, currentTimestamp()], function (err, data) {
+    this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= to_timestamp($2)', [sid, currentTimestamp()], function (err, data) {
       if (err) { return fn(err); }
       if (!data) { return fn(); }
       try {
