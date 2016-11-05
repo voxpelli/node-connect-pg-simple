@@ -5,3 +5,5 @@ node_js:
   - "4"
 sudo: false
 script: npm test
+after_success:
+  - "cat coverage/lcov.info | ./node_modules/.bin/coveralls"

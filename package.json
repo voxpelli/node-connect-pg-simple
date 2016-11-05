@@ -21,18 +21,24 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "node -e \"require('grunt').tasks(['test']);\"",
-    "test-all": "node -e \"require('grunt').tasks(['test-all']);\"",
+    "mocha": "NODE_ENV=test istanbul cover _mocha -- -u exports -R spec test/**/*.spec.js",
+    "dependency-check": "JS_FILES=\"*.js test/*.js\" && dependency-check . $JS_FILES && dependency-check . $JS_FILES --unused --no-dev",
+    "test": "eslint . && npm run dependency-check && npm run mocha",
     "prepush": "npm test"
   },
   "devDependencies": {
-    "chai": "^2.1.1",
+    "chai": "^3.5.0",
     "coveralls": "^2.11.2",
-    "grunt": "^0.4.5",
-    "husky": "^0.10.2",
-    "istanbul": "^0.3.7",
-    "lintlovin": "voxpelli/lintlovin#1.x",
-    "mocha": "^2.1.0",
+    "dependency-check": "^2.5.2",
+    "escape-string-regexp": "^1.0.3",
+    "eslint": "^3.4.0",
+    "eslint-config-semistandard": "^7.0.0",
+    "eslint-config-standard": "^6.0.0",
+    "eslint-plugin-promise": "^3.0.0",
+    "eslint-plugin-standard": "^2.0.0",
+    "husky": "~0.11.4",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.1.2",
     "promise": "^7.0.0",
     "sinon": "^1.13.0"
   }
