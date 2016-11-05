@@ -8,11 +8,13 @@ chai.should();
 describe('PGStore', function () {
   const connectPgSimple = require('../');
 
-  let PGStore, options;
+  let sandbox, PGStore, options;
 
   beforeEach(function () {
+    sandbox = sinon.sandbox.create();
+
     PGStore = connectPgSimple({
-      Store: sinon.stub()
+      Store: sandbox.stub()
     });
 
     options = {
@@ -21,11 +23,15 @@ describe('PGStore', function () {
     };
   });
 
+  afterEach(() => {
+    sandbox.restore();
+  });
+
   describe('pruneSessions', function () {
     let fakeClock;
 
     beforeEach(function () {
-      fakeClock = sinon.useFakeTimers();
+      fakeClock = sandbox.useFakeTimers();
     });
 
     it('should by default run on interval and close', function () {
@@ -33,9 +39,9 @@ describe('PGStore', function () {
 
       const store = new PGStore(options);
 
-      sinon.spy(store, 'pruneSessions');
+      sandbox.spy(store, 'pruneSessions');
 
-      const mock = sinon.mock(store);
+      const mock = sandbox.mock(store);
 
       mock.expects('query').twice().yields();
 
@@ -63,9 +69,9 @@ describe('PGStore', function () {
 
       const store = new PGStore(options);
 
-      sinon.spy(store, 'pruneSessions');
+      sandbox.spy(store, 'pruneSessions');
 
-      const mock = sinon.mock(store);
+      const mock = sandbox.mock(store);
 
       mock.expects('query').twice().yields();
 
@@ -87,9 +93,9 @@ describe('PGStore', function () {
     it('should not run when interval is disabled', function () {
       const store = new PGStore(options);
 
-      sinon.spy(store, 'pruneSessions');
+      sandbox.spy(store, 'pruneSessions');
 
-      const mock = sinon.mock(store);
+      const mock = sandbox.mock(store);
 
       mock.expects('query').never().yields();
 
