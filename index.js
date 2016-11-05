@@ -133,6 +133,7 @@ module.exports = function (session) {
   PGStore.prototype.query = function (query, params, fn) {
     if (!fn && typeof params === 'function') {
       fn = params;
+      params = [];
     }
     this.pg.connect(this.conString, function (err, client, done) {
       if (err) {
