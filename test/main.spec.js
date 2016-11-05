@@ -1,6 +1,3 @@
-/* jshint node: true, expr: true */
-/* global beforeEach, afterEach, describe, it, -Promise */
-
 'use strict';
 
 var chai = require('chai');
@@ -10,9 +7,9 @@ var Promise = require('promise');
 chai.should();
 
 describe('PGStore', function () {
-  var connectPgSimple = require('../'),
-    PGStore,
-    options;
+  const connectPgSimple = require('../');
+
+  let PGStore, options;
 
   beforeEach(function () {
     PGStore = connectPgSimple({
@@ -26,7 +23,6 @@ describe('PGStore', function () {
   });
 
   describe('pruneSessions', function () {
-
     var fakeClock;
 
     beforeEach(function () {
@@ -119,7 +115,6 @@ describe('PGStore', function () {
   });
 
   describe('quotedTable', function () {
-
     it('should not include a schema by default', function () {
       (new PGStore(options)).quotedTable().should.be.a('string').that.equals('"session"');
     });
@@ -149,7 +144,5 @@ describe('PGStore', function () {
       options.tableName = 'barfoo.foobar';
       (new PGStore(options)).quotedTable().should.be.a('string').that.equals('"barfoo.foobar"');
     });
-
   });
-
 });

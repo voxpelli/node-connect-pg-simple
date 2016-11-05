@@ -1,5 +1,3 @@
-/*jslint node: true */
-
 'use strict';
 
 var util = require('util');
@@ -10,11 +8,9 @@ var currentTimestamp = function () {
 };
 
 module.exports = function (session) {
+  const Store = session.Store || session.session.Store;
 
-  var Store = session.Store || session.session.Store,
-    PGStore;
-
-  PGStore = function (options) {
+  const PGStore = function (options) {
     options = options || {};
     Store.call(this, options);
 
@@ -22,7 +18,7 @@ module.exports = function (session) {
     this.tableName = options.tableName || 'session';
 
     this.conString = options.conString || process.env.DATABASE_URL;
-    this.ttl =  options.ttl;
+    this.ttl = options.ttl;
     this.pg = options.pg || require('pg');
     this.ownsPg = !options.pg;
 
@@ -165,7 +161,7 @@ module.exports = function (session) {
       if (err) { return fn(err); }
       if (!data) { return fn(); }
       try {
-        return fn(null, ('string' === typeof data.sess) ? JSON.parse(data.sess) : data.sess);
+        return fn(null, (typeof data.sess === 'string') ? JSON.parse(data.sess) : data.sess);
       } catch (e) {
         return this.destroy(sid, fn);
       }
