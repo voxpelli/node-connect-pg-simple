@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.1.1
+
+* Bug fix: The internal query helper was treating params() wrong when called with two argument. Thanks for reporting @colideum!
+* Bug fix: If the database and the node instances had different clocks, then things wouldn't work that well due to mixed timestamp sources. Now node handles all timestamps. Thanks for reporting @sverkoye!
+
 ## 3.1.0
 
 * Feature: Support the `store.touch()` method to allow for extending the life time of a session without changing the data of it. This enables setting the `resave` option to `false`, which is recommended to avoid a session extender save overwriting another save that adds new data to the session. More info in the [express-session readme](https://github.com/expressjs/session#resave).
