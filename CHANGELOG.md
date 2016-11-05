@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.2
+
+* Bug fix: Previous timestamp fix failed critically, fixing it again. Thanks @G3z and @eemeli
+
 ## 3.1.1
 
 * Bug fix: The internal query helper was treating params() wrong when called with two argument. Thanks for reporting @colideum!
