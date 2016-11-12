@@ -21,14 +21,20 @@
   },
   "main": "index.js",
   "scripts": {
-    "mocha": "NODE_ENV=test istanbul cover _mocha -- -u exports -R spec test/**/*.spec.js",
+    "mocha-all": "NODE_ENV=test istanbul cover _mocha -- -u exports -R spec test/*/*.spec.js test/*.spec.js",
+    "mocha": "NODE_ENV=test istanbul cover _mocha -- -u exports -R spec test/*.spec.js",
     "dependency-check": "JS_FILES=\"*.js test/*.js\" && dependency-check . $JS_FILES && dependency-check . $JS_FILES --unused --no-dev",
-    "test": "eslint . && npm run dependency-check && npm run mocha",
+    "test-all": "installed-check -e && eslint . && npm run dependency-check && npm run mocha-all",
+    "test": "installed-check -e && eslint . && npm run dependency-check && npm run mocha",
     "prepush": "npm test"
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
+    "cookie-signature": "^1.0.6",
+    "cookiejar": "^2.1.0",
     "coveralls": "^2.11.2",
+    "denodeify": "^1.2.1",
     "dependency-check": "^2.5.2",
     "escape-string-regexp": "^1.0.3",
     "eslint": "^3.4.0",
@@ -36,9 +42,14 @@
     "eslint-config-standard": "^6.0.0",
     "eslint-plugin-promise": "^3.0.0",
     "eslint-plugin-standard": "^2.0.0",
+    "express": "^4.14.0",
+    "express-session": "^1.14.2",
     "husky": "~0.11.4",
+    "installed-check": "^2.1.1",
     "istanbul": "^0.4.5",
     "mocha": "^3.1.2",
-    "sinon": "^1.13.0"
+    "sinon": "^1.13.0",
+    "supertest": "^2.0.1",
+    "supertest-as-promised": "^4.0.2"
   }
 }
