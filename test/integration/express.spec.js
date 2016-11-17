@@ -11,12 +11,13 @@ chai.should();
 describe('Express', function () {
   const express = require('express');
   const session = require('express-session');
-  const { Cookie } = require('cookiejar');
+  const Cookie = require('cookiejar').Cookie;
   const signature = require('cookie-signature');
 
   const connectPgSimple = require('../../');
   const dbUtils = require('../db-utils');
-  const { conString, queryPromise } = dbUtils;
+  const conString = dbUtils.conString;
+  const queryPromise = dbUtils.queryPromise;
 
   const secret = 'abc123';
   const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
