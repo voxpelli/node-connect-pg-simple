@@ -3,11 +3,11 @@ node_js:
   - "stable"
   - "6"
   - "4"
-sudo: false
-script: npm run test-all
 before_script:
   - psql -c 'create database connect_pg_simple_test;' -U postgres
+sudo: false
+script: npm run test-all
 after_success:
   - "cat coverage/lcov.info | ./node_modules/.bin/coveralls"
 addons:
-  postgresql: "9.6"
+  postgresql: "9.3"
