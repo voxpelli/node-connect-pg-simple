@@ -5,5 +5,9 @@ node_js:
   - "4"
 sudo: false
 script: npm run test-all
+before_script:
+  - psql -c 'create database connect_pg_simple_test;' -U postgres
 after_success:
   - "cat coverage/lcov.info | ./node_modules/.bin/coveralls"
+addons:
+  postgresql: "9.6"
