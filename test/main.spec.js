@@ -18,7 +18,7 @@ describe('PGStore', function () {
     });
 
     options = {
-      pg: {},
+      pool: {},
       pruneSessionInterval: false
     };
   });

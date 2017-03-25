@@ -45,11 +45,14 @@ var pg = require('pg')
   , session = require('express-session')
   , pgSession = require('connect-pg-simple')(session);
 
+var pgPool = new pg.Pool({
+    // Insert pool options here
+});
+
 app.use(session({
   store: new pgSession({
-    pg : pg,                                  // Use global pg-module
-    conString : process.env.FOO_DATABASE_URL, // Connect using something else than default DATABASE_URL env variable
-    tableName : 'user_sessions'               // Use another table-name than the default "session" one
+    pool : pgPool,                // Connection pool
+    tableName : 'user_sessions'   // Use another table-name than the default "session" one
   }),
   secret: process.env.FOO_COOKIE_SECRET,
   resave: false,
@@ -71,9 +74,9 @@ app.use(session({
 
 ## Advanced options
 
-* **pg** - Recommended. If you want the session store to use the same database module (compatible with [pg](https://www.npmjs.org/package/pg) / [pg.js](https://www.npmjs.org/package/pg.js)) as the rest of your app, then send it in here. Useful as eg. the connection pool then can be shared between the module and the rest of the application. Also useful if you want this module to use the native bindings of [pg](https://www.npmjs.org/package/pg) as this module itself only comes with [pg.js](https://www.npmjs.org/package/pg.js).
+* **pool** - Recommended. Connection pool object (compatible with [pg.Pool](https://github.com/brianc/node-pg-pool)) for the underlying database module. The **conString** option is ignored if this option is specified.
 * **ttl** - the time to live for the session in the database – specified in seconds. Defaults to the cookie maxAge if the cookie has a maxAge defined and otherwise defaults to one day.
-* **conString** - if you don't have your PostgreSQL connection string in the `DATABASE_URL` environment variable (as you do by default on eg. Heroku) – then you need to specify the connection [string or object](https://github.com/brianc/node-postgres/wiki/pg#connectstring-connectionstring-function-callback) here so that this module that create new connections. Needen even if you supply your own database module.
+* **conString** - If you don't specify a pool object, use this option to specify a PostgreSQL connection [string](https://github.com/brianc/node-postgres/wiki/Client#new-clientstring-url-client) and this module will create a new pool for you. If the connection string is in the `DATABASE_URL` environment variable (as you do by default on eg. Heroku) – then this module fallback to that if this option is not specified.
 * **schemaName** - if your session table is in another Postgres schema than the default (it normally isn't), then you can specify that here.
 * **tableName** - if your session table is named something else than `session`, then you can specify that here.
 * **pruneSessionInterval** - sets the delay in seconds at which expired sessions are pruned from the database. Default is `60` seconds. If set to `false` no automatic pruning will happen. Automatic pruning weill happen `pruneSessionInterval` seconds after the last pruning – manual or automatic.
