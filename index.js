@@ -25,25 +25,28 @@ module.exports = function (session) {
       this.ownsPg = false;
     } else {
       const conString = options.conString || process.env.DATABASE_URL;
+      let conObject = options.conObject;
 
-      if (!conString) {
+      if (!conString && !conObject) {
         throw new Error('No database connecting details provided to connect-pg-simple');
       }
 
-      const params = url.parse(conString);
-      const auth = params.auth ? params.auth.split(':') : [];
-      const port = params.port ? parseInt(params.port, 10) : undefined;
-      const database = (params.pathname || '').split('/')[1];
+      if (!conObject) {
+        const params = url.parse(conString);
+        const auth = params.auth ? params.auth.split(':') : [];
+        const port = params.port ? parseInt(params.port, 10) : undefined;
+        const database = (params.pathname || '').split('/')[1];
 
-      const config = {
-        user: auth[0],
-        password: auth[1],
-        host: params.hostname,
-        port: port,
-        database: database
-      };
+        conObject = {
+          user: auth[0],
+          password: auth[1],
+          host: params.hostname,
+          port: port,
+          database: database
+        };
+      }
 
-      this.pool = new (require('pg')).Pool(config);
+      this.pool = new (require('pg')).Pool(conObject);
       this.ownsPg = true;
     }
 

@@ -216,5 +216,29 @@ describe('PGStore', function () {
         return new ProxiedPGStore(baseOptions);
       }, /No database connecting details/);
     });
+
+    it('should support basic conObject', function () {
+      should.not.throw(function () {
+        return new ProxiedPGStore(Object.assign(baseOptions, {
+          conObject: {
+            user: 'user',
+            password: 'pass',
+            host: 'localhost',
+            port: 1234,
+            database: 'connect_pg_simple_test'
+          }
+        }));
+      });
+
+      poolStub.should.have.been.calledOnce;
+      poolStub.firstCall.args.should.have.lengthOf(1);
+      poolStub.firstCall.args[0].should.deep.equal({
+        user: 'user',
+        password: 'pass',
+        host: 'localhost',
+        port: 1234,
+        database: 'connect_pg_simple_test'
+      });
+    });
   });
 });
