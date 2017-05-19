@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.0 (2017-05-19)
+
+* Breaking change + improved support: When the [pg](https://www.npmjs.com/package/pg) module is provided to this module, then a pool from the new `6.x` version of that module is now required rather than providing the module itself
+
 ## 3.1.2
 
 * Bug fix: Previous timestamp fix failed critically, fixing it again. Thanks @G3z and @eemeli
