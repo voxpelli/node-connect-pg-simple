@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.1.0 (2017-05-19)
+
+* Feature: New option `conObject` enables connection details to be set through an object
+* Improvement: Hardening of `conString` parsing + some added tests of it
+
 ## 4.0.0 (2017-05-19)
 
 * Breaking change + improved support: When the [pg](https://www.npmjs.com/package/pg) module is provided to this module, then a pool from the new `6.x` version of that module is now required rather than providing the module itself
