@@ -1,5 +1,6 @@
 'use strict';
 
+const url = require('url');
 const util = require('util');
 const oneDay = 86400;
 
@@ -17,10 +18,27 @@ module.exports = function (session) {
     this.schemaName = options.schemaName || null;
     this.tableName = options.tableName || 'session';
 
-    this.conString = options.conString || process.env.DATABASE_URL;
     this.ttl = options.ttl;
-    this.pg = options.pg || require('pg');
-    this.ownsPg = !options.pg;
+
+    if (options.pool !== undefined) {
+      this.pool = options.pool;
+      this.ownsPg = false;
+    } else {
+      const conString = options.conString || process.env.DATABASE_URL;
+      const params = url.parse(conString);
+      const auth = params.auth.split(':');
+
+      const config = {
+        user: auth[0],
+        password: auth[1],
+        host: params.hostname,
+        port: params.port,
+        database: params.pathname.split('/')[1]
+      };
+
+      this.pool = new (require('pg')).Pool(config);
+      this.ownsPg = true;
+    }
 
     this.errorLog = options.errorLog || console.error.bind(console);
 
@@ -57,7 +75,7 @@ module.exports = function (session) {
     }
 
     if (this.ownsPg) {
-      this.pg.end();
+      this.pool.end();
     }
   };
 
@@ -135,16 +153,9 @@ module.exports = function (session) {
       fn = params;
       params = [];
     }
-    this.pg.connect(this.conString, function (err, client, done) {
-      if (err) {
-        done(client);
-        if (fn) { fn(err); }
-      } else {
-        client.query(query, params || [], function (err, result) {
-          done(err || false);
-          if (fn) { fn(err, result && result.rows[0] ? result.rows[0] : false); }
-        });
-      }
+
+    this.pool.query(query, params || [], function (err, res) {
+      if (fn) { fn(err, res && res.rows[0] ? res.rows[0] : false); }
     });
   };
 
