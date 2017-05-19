@@ -3,7 +3,7 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
-const request = require('supertest-as-promised');
+const request = require('supertest');
 
 chai.use(chaiAsPromised);
 chai.should();
