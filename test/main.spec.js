@@ -2,8 +2,12 @@
 
 const chai = require('chai');
 const sinon = require('sinon');
+const sinonChai = require('sinon-chai');
+const proxyquire = require('proxyquire').noPreserveCache().noCallThru();
 
-chai.should();
+chai.use(sinonChai);
+
+const should = chai.should();
 
 describe('PGStore', function () {
   const connectPgSimple = require('../');
@@ -148,6 +152,69 @@ describe('PGStore', function () {
     it('should not care about dots in names', function () {
       options.tableName = 'barfoo.foobar';
       (new PGStore(options)).quotedTable().should.be.a('string').that.equals('"barfoo.foobar"');
+    });
+  });
+
+  describe('configSetup', function () {
+    let poolStub;
+    let ProxiedPGStore;
+    let baseOptions;
+
+    beforeEach(function () {
+      delete process.env.DATABASE_URL;
+
+      poolStub = sinon.stub();
+
+      const PGMock = { Pool: poolStub };
+      const proxiedConnectPgSimple = proxyquire('../', { pg: PGMock });
+
+      ProxiedPGStore = proxiedConnectPgSimple({
+        Store: sandbox.stub()
+      });
+
+      baseOptions = { pruneSessionInterval: false };
+    });
+
+    it('should support basic conString', function () {
+      should.not.throw(function () {
+        return new ProxiedPGStore(Object.assign(baseOptions, {
+          conString: 'postgres://user:pass@localhost:1234/connect_pg_simple_test'
+        }));
+      });
+
+      poolStub.should.have.been.calledOnce;
+      poolStub.firstCall.args.should.have.lengthOf(1);
+      poolStub.firstCall.args[0].should.deep.equal({
+        user: 'user',
+        password: 'pass',
+        host: 'localhost',
+        port: 1234,
+        database: 'connect_pg_simple_test'
+      });
+    });
+
+    it('should support password less conString', function () {
+      should.not.throw(function () {
+        return new ProxiedPGStore(Object.assign(baseOptions, {
+          conString: 'postgres://postgres@localhost/connect_pg_simple_test'
+        }));
+      });
+
+      poolStub.should.have.been.calledOnce;
+      poolStub.firstCall.args.should.have.lengthOf(1);
+      poolStub.firstCall.args[0].should.deep.equal({
+        user: 'postgres',
+        password: undefined,
+        host: 'localhost',
+        port: undefined,
+        database: 'connect_pg_simple_test'
+      });
+    });
+
+    it('should throw when no connection details', function () {
+      should.throw(function () {
+        return new ProxiedPGStore(baseOptions);
+      }, /No database connecting details/);
     });
   });
 });
