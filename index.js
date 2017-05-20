@@ -23,6 +23,12 @@ module.exports = function (session) {
     if (options.pool !== undefined) {
       this.pool = options.pool;
       this.ownsPg = false;
+    } else if (options.pgPromise !== undefined) {
+      if (typeof options.pgPromise.query !== 'function') {
+        throw new Error('`pgPromise` config must point to an existing and configured instance of pg-promise pointing at your database');
+      }
+      this.pgPromise = options.pgPromise;
+      this.ownsPg = false;
     } else {
       const conString = options.conString || process.env.DATABASE_URL;
       let conObject = options.conObject;
@@ -164,9 +170,15 @@ module.exports = function (session) {
       params = [];
     }
 
-    this.pool.query(query, params || [], function (err, res) {
-      if (fn) { fn(err, res && res.rows[0] ? res.rows[0] : false); }
-    });
+    if (this.pgPromise) {
+      this.pgPromise.query(query, params || [])
+        .then(function (res) { fn && fn(null, res && res[0] ? res[0] : false); })
+        .catch(function (err) { fn && fn(err, false); });
+    } else {
+      this.pool.query(query, params || [], function (err, res) {
+        if (fn) { fn(err, res && res.rows[0] ? res.rows[0] : false); }
+      });
+    }
   };
 
   /**

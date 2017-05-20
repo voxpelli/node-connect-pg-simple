@@ -13,7 +13,7 @@ A simple, minimal PostgreSQL session store for Express/Connect
 npm install connect-pg-simple
 ```
 
-Once npm installed the module, you need to create the **session** table in your database. For that you can use the [table.sql] (https://github.com/voxpelli/node-connect-pg-simple/blob/master/table.sql) file provided with the module: 
+Once npm installed the module, you need to create the **session** table in your database. For that you can use the [table.sql] (https://github.com/voxpelli/node-connect-pg-simple/blob/master/table.sql) file provided with the module:
 
 ```bash
 psql mydatabase < node_modules/connect-pg-simple/table.sql
@@ -75,9 +75,10 @@ app.use(session({
 ## Advanced options
 
 * **pool** - Recommended. Connection pool object (compatible with [pg.Pool](https://github.com/brianc/node-pg-pool)) for the underlying database module. The **conString** option is ignored if this option is specified.
-* **ttl** - the time to live for the session in the database – specified in seconds. Defaults to the cookie maxAge if the cookie has a maxAge defined and otherwise defaults to one day.
+* **pgPromise** - Existing instance of `pg-promise` to be used for DB communications. The **conString** option is ignored if this option is specified.
 * **conString** - If you don't specify a pool object, use this option or `conObject` to specify a PostgreSQL connection [string](https://github.com/brianc/node-postgres/wiki/Client#new-clientstring-url-client) and this module will create a new pool for you. If the connection string is in the `DATABASE_URL` environment variable (as you do by default on eg. Heroku) – then this module fallback to that if this option is not specified.
 * **conObject** - If you don't specify a pool object, use this option or `conString` to specify a PostgreSQL Pool connection [object](https://github.com/brianc/node-postgres#pooling-example) and this module will create a new pool for you.
+* **ttl** - the time to live for the session in the database – specified in seconds. Defaults to the cookie maxAge if the cookie has a maxAge defined and otherwise defaults to one day.
 * **schemaName** - if your session table is in another Postgres schema than the default (it normally isn't), then you can specify that here.
 * **tableName** - if your session table is named something else than `session`, then you can specify that here.
 * **pruneSessionInterval** - sets the delay in seconds at which expired sessions are pruned from the database. Default is `60` seconds. If set to `false` no automatic pruning will happen. Automatic pruning weill happen `pruneSessionInterval` seconds after the last pruning – manual or automatic.
