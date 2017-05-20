@@ -4,8 +4,6 @@ const chai = require('chai');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
 const proxyquire = require('proxyquire').noPreserveCache().noCallThru();
-const sinonStubPromise = require('sinon-stub-promise');
-sinonStubPromise(sinon);
 chai.use(sinonChai);
 
 const should = chai.should();
@@ -241,6 +239,27 @@ describe('PGStore', function () {
         database: 'connect_pg_simple_test'
       });
     });
+  });
+
+  describe('pgPromise', function () {
+    let poolStub;
+    let ProxiedPGStore;
+    let baseOptions;
+
+    beforeEach(function () {
+      delete process.env.DATABASE_URL;
+
+      poolStub = sinon.stub();
+
+      const PGMock = { Pool: poolStub };
+      const proxiedConnectPgSimple = proxyquire('../', { pg: PGMock });
+
+      ProxiedPGStore = proxiedConnectPgSimple({
+        Store: sandbox.stub()
+      });
+
+      baseOptions = { pruneSessionInterval: false };
+    });
 
     it('should support pgPromise config', function () {
       should.not.throw(function () {
@@ -251,6 +270,7 @@ describe('PGStore', function () {
         }));
       });
     });
+
     it('should throw on bad pgPromise', function () {
       should.throw(function () {
         return new ProxiedPGStore(Object.assign(baseOptions, {
@@ -258,17 +278,19 @@ describe('PGStore', function () {
         }));
       });
     });
+
     it('should pass parameters to pgPromise', function () {
-      let pgPromiseStub = {};
-      let queryStub = sinon.stub();
-      queryStub.returnsPromise().resolves(true);
-      pgPromiseStub = {
+      const queryStub = sinon.stub().resolves(true);
+      const pgPromiseStub = {
         query: queryStub
       };
-      let store = new ProxiedPGStore(Object.assign(baseOptions, {
+
+      const store = new ProxiedPGStore(Object.assign(baseOptions, {
         pgPromise: pgPromiseStub
       }));
+
       store.query('select', [1, 2]);
+
       queryStub.should.have.been.calledOnce;
       queryStub.firstCall.args[0].should.equal('select');
       queryStub.firstCall.args[1].should.deep.equal([1, 2]);
