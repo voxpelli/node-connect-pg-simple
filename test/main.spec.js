@@ -4,7 +4,8 @@ const chai = require('chai');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
 const proxyquire = require('proxyquire').noPreserveCache().noCallThru();
-
+const sinonStubPromise = require('sinon-stub-promise');
+sinonStubPromise(sinon);
 chai.use(sinonChai);
 
 const should = chai.should();
@@ -239,6 +240,38 @@ describe('PGStore', function () {
         port: 1234,
         database: 'connect_pg_simple_test'
       });
+    });
+
+    it('should support pgPromise config', function () {
+      should.not.throw(function () {
+        return new ProxiedPGStore(Object.assign(baseOptions, {
+          pgPromise: {
+            query: function () {}
+          }
+        }));
+      });
+    });
+    it('should throw on bad pgPromise', function () {
+      should.throw(function () {
+        return new ProxiedPGStore(Object.assign(baseOptions, {
+          pgPromise: {}
+        }));
+      });
+    });
+    it('should pass parameters to pgPromise', function () {
+      let pgPromiseStub = {};
+      let queryStub = sinon.stub();
+      queryStub.returnsPromise().resolves(true);
+      pgPromiseStub = {
+        query: queryStub
+      };
+      let store = new ProxiedPGStore(Object.assign(baseOptions, {
+        pgPromise: pgPromiseStub
+      }));
+      store.query('select', [1, 2]);
+      queryStub.should.have.been.calledOnce;
+      queryStub.firstCall.args[0].should.equal('select');
+      queryStub.firstCall.args[1].should.deep.equal([1, 2]);
     });
   });
 });

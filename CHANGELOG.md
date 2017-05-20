@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.2.0 (2017-05-19)
+
+* Feature: New option `pgPromise` enables the library to re-use an existing connection from [pg-promise](https://github.com/vitaly-t/pg-promise). This is a mutually-exclusive alternative to specifying `pool`, `conObject`, or `conString` (only one of these can be provided).
+
 ## 4.1.0 (2017-05-19)
 
 * Feature: New option `conObject` enables connection details to be set through an object
