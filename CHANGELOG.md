@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.2.1 (2017-08-20)
+
+* Fix: The pruning timer will no longer keep Node alive, it's been given the [`unref()`](https://nodejs.org/api/timers.html#timers_timeout_unref) treatment
+
 ## 4.2.0 (2017-05-20)
 
 * Feature: New option `pgPromise` enables the library to re-use an existing connection from [pg-promise](https://github.com/vitaly-t/pg-promise). This is a mutually-exclusive alternative to specifying `pool`, `conObject`, or `conString` (only one of these can be provided).
