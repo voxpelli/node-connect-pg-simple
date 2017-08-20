@@ -86,5 +86,5 @@ app.use(session({
 
 ## Useful methods
 
-* **close()** – if automatic interval pruning is on, which it is by default as of `3.0.0`, then the timers will block any graceful shutdown unless you tell the automatic pruning to stop by closing the session handler using this method.
+* **close()** – if this module used its own database module to connect to Postgres, then this will shut that connection down to allow a graceful shutdown.
 * **pruneSessions([callback(err)])** – will prune old sessions. Only really needed to be called if **pruneSessionInterval** has been set to `false` – which can be useful if one wants improved control of the pruning.

@@ -117,6 +117,7 @@ module.exports = function (session) {
           clearTimeout(this.pruneTimer);
         }
         this.pruneTimer = setTimeout(this.pruneSessions.bind(this, true), this.pruneSessionInterval);
+        this.pruneTimer.unref();
       }
     }.bind(this));
   };
