@@ -29,8 +29,8 @@
     "prepush": "npm test"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "chai-as-promised": "^6.0.0",
+    "chai": "^4.1.1",
+    "chai-as-promised": "^7.1.1",
     "cookie-signature": "^1.0.6",
     "cookiejar": "^2.1.0",
     "coveralls": "^2.11.2",
@@ -46,13 +46,13 @@
     "eslint-plugin-standard": "^3.0.1",
     "express": "^4.14.0",
     "express-session": "^1.14.2",
-    "husky": "^0.13.3",
+    "husky": "^0.14.3",
     "installed-check": "^2.1.1",
     "istanbul": "^0.4.5",
     "mocha": "^3.1.2",
     "pg-promise": "^5.7.1",
     "proxyquire": "^1.8.0",
-    "sinon": "^2.2.0",
+    "sinon": "^3.2.1",
     "sinon-chai": "^2.10.0",
     "supertest": "^3.0.0"
   }
