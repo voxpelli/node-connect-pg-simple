@@ -23,7 +23,7 @@
   "scripts": {
     "mocha-all": "NODE_ENV=test istanbul cover _mocha -- -u exports -R spec test/*/*.spec.js test/*.spec.js",
     "mocha": "NODE_ENV=test istanbul cover _mocha -- -u exports -R spec test/*.spec.js",
-    "dependency-check": "JS_FILES=\"*.js test/*.js\" && dependency-check . $JS_FILES && dependency-check . $JS_FILES --unused --no-dev",
+    "dependency-check": "JS_FILES=\"*.js test/*.js test/*/*.js\" && dependency-check . $JS_FILES && dependency-check . $JS_FILES --unused --no-dev",
     "test-all": "installed-check -e && eslint . && npm run dependency-check && npm run mocha-all",
     "test": "installed-check -e && eslint . && npm run dependency-check && npm run mocha",
     "prepush": "npm test"
