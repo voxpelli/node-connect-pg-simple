@@ -214,18 +214,9 @@ module.exports = function (session) {
   PGStore.prototype.set = function (sid, sess, fn) {
     const self = this;
     const expireTime = this.getExpireTime(sess.cookie.maxAge);
-    const query = 'UPDATE ' + this.quotedTable() + ' SET sess = $1, expire = to_timestamp($2) WHERE sid = $3 RETURNING sid';
-
+    const query = 'INSERT INTO ' + self.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 ON CONFLICT (sid) DO UPDATE SET expire = to_timestamp($2) RETURNING sid';
     this.query(query, [sess, expireTime, sid], function (err, data) {
-      if (!err && data === false) {
-        const query = 'INSERT INTO ' + self.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 WHERE NOT EXISTS (SELECT 1 FROM ' + self.quotedTable() + ' WHERE sid = $4)';
-
-        self.query(query, [sess, expireTime, sid, sid], function (err) {
-          if (fn) { fn.apply(this, err); }
-        });
-      } else {
-        if (fn) { fn.apply(this, err); }
-      }
+      if (fn) { fn.apply(this, err); }
     });
   };
 
