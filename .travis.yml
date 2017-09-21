@@ -9,4 +9,4 @@ script: npm run test-all
 after_success:
   - "cat coverage/lcov.info | ./node_modules/.bin/coveralls"
 addons:
-  postgresql: "9.3"
+  postgresql: "9.5"
