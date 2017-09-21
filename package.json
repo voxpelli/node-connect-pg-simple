@@ -14,10 +14,10 @@
   },
   "license": "MIT",
   "dependencies": {
-    "pg": ">=6.0.0-0 <7.0.0-0"
+    "pg": ">=6.0.0-0 <8.0.0-0"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=6.4.0"
   },
   "main": "index.js",
   "scripts": {
