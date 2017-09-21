@@ -8,6 +8,8 @@ const request = require('supertest');
 chai.use(chaiAsPromised);
 chai.should();
 
+const hasSingleRowWithCountProperty = require('../promise-utils').hasSingleRowWithCountProperty;
+
 describe('Express', function () {
   const express = require('express');
   const session = require('express-session');
@@ -59,13 +61,13 @@ describe('Express', function () {
       const app = appSetup(store);
 
       return queryPromise('SELECT COUNT(sid) FROM session')
-        .should.eventually.have.deep.property('rows[0].count', '0')
+        .then(hasSingleRowWithCountProperty('0'))
         .then(() => request(app)
           .get('/')
           .expect(200)
         )
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '1');
+        .then(hasSingleRowWithCountProperty('1'));
     });
 
     it('should return the token it generates', () => {
@@ -92,13 +94,13 @@ describe('Express', function () {
       const agent = request.agent(app);
 
       return queryPromise('SELECT COUNT(sid) FROM session')
-        .should.eventually.have.deep.property('rows[0].count', '0')
+        .then(hasSingleRowWithCountProperty('0'))
         .then(() => agent.get('/'))
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '1')
+        .then(hasSingleRowWithCountProperty('1'))
         .then(() => agent.get('/').expect(200))
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '1');
+        .then(hasSingleRowWithCountProperty('1'));
     });
 
     it('should not reuse existing session when not given a cookie', () => {
@@ -106,13 +108,13 @@ describe('Express', function () {
       const app = appSetup(store);
 
       return queryPromise('SELECT COUNT(sid) FROM session')
-        .should.eventually.have.deep.property('rows[0].count', '0')
+        .then(hasSingleRowWithCountProperty('0'))
         .then(() => request(app).get('/'))
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '1')
+        .then(hasSingleRowWithCountProperty('1'))
         .then(() => request(app).get('/').expect(200))
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '2');
+        .then(hasSingleRowWithCountProperty('2'));
     });
 
     it('should invalidate a too old token', () => {
@@ -123,26 +125,26 @@ describe('Express', function () {
       const clock = sandbox.useFakeTimers(Date.now());
 
       return queryPromise('SELECT COUNT(sid) FROM session')
-        .should.eventually.have.deep.property('rows[0].count', '0')
+        .then(hasSingleRowWithCountProperty('0'))
         .then(() => Promise.all([
           request(app).get('/'),
           agent.get('/')
         ]))
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '2')
+        .then(hasSingleRowWithCountProperty('2'))
         .then(() => {
           clock.tick(maxAge * 0.6);
           return new Promise((resolve, reject) => store.pruneSessions(err => err ? reject(err) : resolve()));
         })
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '2')
+        .then(hasSingleRowWithCountProperty('2'))
         .then(() => agent.get('/').expect(200))
         .then(() => {
           clock.tick(maxAge * 0.6);
           return new Promise((resolve, reject) => store.pruneSessions(err => err ? reject(err) : resolve()));
         })
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '1');
+        .then(hasSingleRowWithCountProperty('1'));
     });
   });
 });

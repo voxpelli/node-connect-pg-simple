@@ -4,8 +4,9 @@ const pathModule = require('path');
 
 const denodeify = require('denodeify');
 const pg = require('pg');
+const pguser = process.env.PGUSER || 'postgres';
 const pool = new pg.Pool({
-  user: 'postgres',
+  user: pguser,
   host: 'localhost',
   database: 'connect_pg_simple_test'
 });
@@ -24,7 +25,7 @@ const initTables = function () {
 };
 
 module.exports = Object.freeze({
-  conString: 'postgres://postgres@localhost/connect_pg_simple_test',
+  conString: 'postgres://' + pguser + '@localhost/connect_pg_simple_test',
   queryPromise: pool.query.bind(pool),
   removeTables,
   initTables
