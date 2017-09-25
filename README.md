@@ -77,6 +77,7 @@ app.use(session({
 * **pool** - Recommended. Connection pool object (compatible with [pg.Pool](https://github.com/brianc/node-pg-pool)) for the underlying database module. The **conString** option is ignored if this option is specified.
 * **pgPromise** - Existing instance of `pg-promise` to be used for DB communications. The **conString** option is ignored if this option is specified.
 * **conString** - If you don't specify a pool object, use this option or `conObject` to specify a PostgreSQL connection [string](https://github.com/brianc/node-postgres/wiki/Client#new-clientstring-url-client) and this module will create a new pool for you. If the connection string is in the `DATABASE_URL` environment variable (as you do by default on eg. Heroku) – then this module fallback to that if this option is not specified.
+If the **conString** contains query parameters, for example `url?ssl=require`, those will be parsed and passed to `node-postgres`, too.
 * **conObject** - If you don't specify a pool object, use this option or `conString` to specify a PostgreSQL Pool connection [object](https://github.com/brianc/node-postgres#pooling-example) and this module will create a new pool for you.
 * **ttl** - the time to live for the session in the database – specified in seconds. Defaults to the cookie maxAge if the cookie has a maxAge defined and otherwise defaults to one day.
 * **schemaName** - if your session table is in another Postgres schema than the default (it normally isn't), then you can specify that here.

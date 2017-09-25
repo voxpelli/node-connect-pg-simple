@@ -38,7 +38,7 @@ module.exports = function (session) {
       }
 
       if (!conObject) {
-        const params = url.parse(conString);
+        const params = url.parse(conString, true);
         const auth = params.auth ? params.auth.split(':') : [];
         const port = params.port ? parseInt(params.port, 10) : undefined;
         const database = (params.pathname || '').split('/')[1];
@@ -50,6 +50,8 @@ module.exports = function (session) {
           port: port,
           database: database
         };
+
+        for (let k in params.query) conObject[k] = params.query[k];
       }
 
       this.pool = new (require('pg')).Pool(conObject);

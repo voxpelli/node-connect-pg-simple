@@ -210,6 +210,25 @@ describe('PGStore', function () {
       });
     });
 
+    it('should support conString with query params', function () {
+      should.not.throw(function () {
+        return new ProxiedPGStore(Object.assign(baseOptions, {
+          conString: 'postgres://user:pass@localhost:1234/connect_pg_simple_test?ssl=require'
+        }));
+      });
+
+      poolStub.should.have.been.calledOnce;
+      poolStub.firstCall.args.should.have.lengthOf(1);
+      poolStub.firstCall.args[0].should.deep.equal({
+        user: 'user',
+        password: 'pass',
+        host: 'localhost',
+        port: 1234,
+        database: 'connect_pg_simple_test',
+        ssl: 'require'
+      });
+    });
+
     it('should throw when no connection details', function () {
       should.throw(function () {
         return new ProxiedPGStore(baseOptions);
@@ -265,7 +284,7 @@ describe('PGStore', function () {
       should.not.throw(function () {
         return new ProxiedPGStore(Object.assign(baseOptions, {
           pgPromise: {
-            query: function () {}
+            query: function () { }
           }
         }));
       });
