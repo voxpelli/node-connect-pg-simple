@@ -3,9 +3,8 @@
 const pathModule = require('path');
 
 const dotEnvFile = process.env.DOTENV_FILE || pathModule.resolve(__dirname, './.env');
-const dotEnvResult = require('dotenv').load({ path: dotEnvFile });
 
-if (dotEnvResult.error) { throw dotEnvResult.error; }
+require('dotenv').config({ path: dotEnvFile });
 
 const conObject = {
   database: process.env.PGDATABASE || 'connect_pg_simple_test'
