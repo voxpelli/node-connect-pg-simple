@@ -1,6 +1,5 @@
 'use strict';
 
-const url = require('url');
 const util = require('util');
 const oneDay = 86400;
 
@@ -33,23 +32,12 @@ module.exports = function (session) {
       const conString = options.conString || process.env.DATABASE_URL;
       let conObject = options.conObject;
 
-      if (!conString && !conObject) {
-        throw new Error('No database connecting details provided to connect-pg-simple');
-      }
-
       if (!conObject) {
-        const params = url.parse(conString);
-        const auth = params.auth ? params.auth.split(':') : [];
-        const port = params.port ? parseInt(params.port, 10) : undefined;
-        const database = (params.pathname || '').split('/')[1];
+        conObject = {};
 
-        conObject = {
-          user: auth[0],
-          password: auth[1],
-          host: params.hostname,
-          port: port,
-          database: database
-        };
+        if (conString) {
+          conObject.connectionString = conString;
+        }
       }
 
       this.pool = new (require('pg')).Pool(conObject);
