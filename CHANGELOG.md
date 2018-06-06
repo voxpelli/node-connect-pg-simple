@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.0.0 (2018-06-06)
+
+* Breaking change: Now requires at least Node.js 8.x (this as Node.js 6.x [only have a short time left in its LTS](https://github.com/nodejs/Release) and I rather don't bump the major version more often than I have to)
+* Breaking change: Now expects [pg](https://www.npmjs.com/package/pg) 7.x to be used
+* Fix: Connection string is now handled by [pg](https://www.npmjs.com/package/pg) instead of by this module. Should improve support for things like ssl.
+
 ## 4.2.1 (2017-08-20)
 
 * Fix: The pruning timer will no longer keep Node alive, it's been given the [`unref()`](https://nodejs.org/api/timers.html#timers_timeout_unref) treatment
