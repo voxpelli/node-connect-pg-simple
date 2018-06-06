@@ -2,5 +2,22 @@
   "extends": [
     "config:js-lib",
     "group:linters"
+  ],
+  "packageRules": [
+    {
+      "packageNames": [
+        "coveralls",
+        "istanbul",
+        "mocha",
+        "mock-fs",
+        "nock",
+        "nyc"
+      ],
+      "packagePatterns": [
+        "^chai",
+        "^sinon"
+      ],
+      "groupName": "unit test modules"  
+    }
   ]
 }
