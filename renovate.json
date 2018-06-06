@@ -1,25 +1,7 @@
 {
   "extends": [
     "config:js-lib",
-    "group:linters"
-  ],
-  "packageRules": [
-    {
-      "packageNames": [
-        "coveralls",
-        "istanbul",
-        "mocha",
-        "mock-fs",
-        "nock",
-        "nyc",
-        "proxyquire",
-        "supertest"
-      ],
-      "packagePatterns": [
-        "^chai",
-        "^sinon"
-      ],
-      "groupName": "unit test modules"  
-    }
+    "group:linters",
+    "@voxpelli:unitGroup"
   ]
 }
