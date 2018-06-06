@@ -11,7 +11,9 @@
         "mocha",
         "mock-fs",
         "nock",
-        "nyc"
+        "nyc",
+        "proxyquire",
+        "supertest"
       ],
       "packagePatterns": [
         "^chai",
