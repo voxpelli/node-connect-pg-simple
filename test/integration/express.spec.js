@@ -16,7 +16,7 @@ describe('Express', function () {
 
   const connectPgSimple = require('../../');
   const dbUtils = require('../db-utils');
-  const conString = dbUtils.conString;
+  const conObject = dbUtils.conObject;
   const queryPromise = dbUtils.queryPromise;
 
   const secret = 'abc123';
@@ -55,21 +55,21 @@ describe('Express', function () {
 
   describe('main', function () {
     it('should generate a token', () => {
-      const store = new (connectPgSimple(session))({ conString });
+      const store = new (connectPgSimple(session))({ conObject });
       const app = appSetup(store);
 
       return queryPromise('SELECT COUNT(sid) FROM session')
-        .should.eventually.have.deep.property('rows[0].count', '0')
+        .should.eventually.have.nested.property('rows[0].count', '0')
         .then(() => request(app)
           .get('/')
           .expect(200)
         )
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '1');
+        .should.eventually.have.nested.property('rows[0].count', '1');
     });
 
     it('should return the token it generates', () => {
-      const store = new (connectPgSimple(session))({ conString });
+      const store = new (connectPgSimple(session))({ conObject });
       const app = appSetup(store);
 
       return request(app)
@@ -83,66 +83,66 @@ describe('Express', function () {
           return signature.unsign(cookieValue.substr(2), secret);
         })
         .then(decodedCookie => queryPromise('SELECT sid FROM session WHERE sid = $1', [decodedCookie]))
-        .should.eventually.have.deep.property('rowCount', 1);
+        .should.eventually.have.nested.property('rowCount', 1);
     });
 
     it('should reuse existing session when given a cookie', () => {
-      const store = new (connectPgSimple(session))({ conString });
+      const store = new (connectPgSimple(session))({ conObject });
       const app = appSetup(store);
       const agent = request.agent(app);
 
       return queryPromise('SELECT COUNT(sid) FROM session')
-        .should.eventually.have.deep.property('rows[0].count', '0')
+        .should.eventually.have.nested.property('rows[0].count', '0')
         .then(() => agent.get('/'))
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '1')
+        .should.eventually.have.nested.property('rows[0].count', '1')
         .then(() => agent.get('/').expect(200))
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '1');
+        .should.eventually.have.nested.property('rows[0].count', '1');
     });
 
     it('should not reuse existing session when not given a cookie', () => {
-      const store = new (connectPgSimple(session))({ conString });
+      const store = new (connectPgSimple(session))({ conObject });
       const app = appSetup(store);
 
       return queryPromise('SELECT COUNT(sid) FROM session')
-        .should.eventually.have.deep.property('rows[0].count', '0')
+        .should.eventually.have.nested.property('rows[0].count', '0')
         .then(() => request(app).get('/'))
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '1')
+        .should.eventually.have.nested.property('rows[0].count', '1')
         .then(() => request(app).get('/').expect(200))
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '2');
+        .should.eventually.have.nested.property('rows[0].count', '2');
     });
 
     it('should invalidate a too old token', () => {
-      const store = new (connectPgSimple(session))({ conString, pruneSessionInterval: false });
+      const store = new (connectPgSimple(session))({ conObject, pruneSessionInterval: false });
       const app = appSetup(store);
       const agent = request.agent(app);
 
       const clock = sandbox.useFakeTimers(Date.now());
 
       return queryPromise('SELECT COUNT(sid) FROM session')
-        .should.eventually.have.deep.property('rows[0].count', '0')
+        .should.eventually.have.nested.property('rows[0].count', '0')
         .then(() => Promise.all([
           request(app).get('/'),
           agent.get('/')
         ]))
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '2')
+        .should.eventually.have.nested.property('rows[0].count', '2')
         .then(() => {
           clock.tick(maxAge * 0.6);
           return new Promise((resolve, reject) => store.pruneSessions(err => err ? reject(err) : resolve()));
         })
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '2')
+        .should.eventually.have.nested.property('rows[0].count', '2')
         .then(() => agent.get('/').expect(200))
         .then(() => {
           clock.tick(maxAge * 0.6);
           return new Promise((resolve, reject) => store.pruneSessions(err => err ? reject(err) : resolve()));
         })
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
-        .should.eventually.have.deep.property('rows[0].count', '1');
+        .should.eventually.have.nested.property('rows[0].count', '1');
     });
   });
 });

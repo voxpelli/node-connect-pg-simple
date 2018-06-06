@@ -2,13 +2,19 @@
 
 const pathModule = require('path');
 
+const dotEnvFile = process.env.DOTENV_FILE || pathModule.resolve(__dirname, './.env');
+const dotEnvResult = require('dotenv').load({ path: dotEnvFile });
+
+if (dotEnvResult.error) { throw dotEnvResult.error; }
+
+const conObject = {
+  database: process.env.PGDATABASE || 'connect_pg_simple_test'
+};
+
 const denodeify = require('denodeify');
 const pg = require('pg');
-const pool = new pg.Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'connect_pg_simple_test'
-});
+
+const pool = new pg.Pool(conObject);
 
 const readFile = denodeify(require('fs').readFile);
 
@@ -24,7 +30,7 @@ const initTables = function () {
 };
 
 module.exports = Object.freeze({
-  conString: 'postgres://postgres@localhost/connect_pg_simple_test',
+  conObject,
   queryPromise: pool.query.bind(pool),
   removeTables,
   initTables

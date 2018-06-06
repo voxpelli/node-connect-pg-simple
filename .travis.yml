@@ -1,8 +1,8 @@
 language: node_js
 node_js:
   - "stable"
-  - "6"
-  - "4"
+  - "9"
+  - "8"
 before_script:
   - psql -c 'create database connect_pg_simple_test;' -U postgres
 sudo: false

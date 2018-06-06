@@ -14,18 +14,18 @@
   },
   "license": "MIT",
   "dependencies": {
-    "pg": ">=6.0.0-0 <7.0.0-0"
+    "pg": "^7.4.3"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=8.0.0"
   },
   "main": "index.js",
   "scripts": {
     "mocha-all": "NODE_ENV=test istanbul cover _mocha -- -u exports -R spec test/*/*.spec.js test/*.spec.js",
     "mocha": "NODE_ENV=test istanbul cover _mocha -- -u exports -R spec test/*.spec.js",
     "dependency-check": "JS_FILES=\"*.js test/*.js test/*/*.js\" && dependency-check . $JS_FILES && dependency-check . $JS_FILES --unused --no-dev",
-    "test-all": "installed-check -e && eslint . && npm run --silent dependency-check && npm run --silent mocha-all",
-    "test": "installed-check -e && eslint . && npm run --silent dependency-check && npm run --silent mocha",
+    "test": "installed-check -e && eslint . && npm run --silent dependency-check && npm run --silent mocha-all",
+    "test-light": "installed-check -e && eslint . && npm run --silent dependency-check && npm run --silent mocha",
     "prepush": "npm test"
   },
   "devDependencies": {
@@ -36,6 +36,7 @@
     "coveralls": "2.13.3",
     "denodeify": "1.2.1",
     "dependency-check": "3.1.0",
+    "dotenv": "4.0.0",
     "escape-string-regexp": "1.0.5",
     "eslint": "3.19.0",
     "eslint-config-semistandard": "11.0.0",
