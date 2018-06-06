@@ -3,8 +3,9 @@
 A simple, minimal PostgreSQL session store for Express/Connect
 
 [![Build Status](https://travis-ci.org/voxpelli/node-connect-pg-simple.svg?branch=master)](https://travis-ci.org/voxpelli/node-connect-pg-simple)
-[![Coverage Status](https://img.shields.io/coveralls/voxpelli/node-connect-pg-simple.svg)](https://coveralls.io/r/voxpelli/node-connect-pg-simple)
-[![Dependency Status](https://gemnasium.com/voxpelli/node-connect-pg-simple.svg)](https://gemnasium.com/voxpelli/node-connect-pg-simple)
+[![Coverage Status](https://coveralls.io/repos/voxpelli/node-connect-pg-simple/badge.svg)](https://coveralls.io/r/voxpelli/node-connect-pg-simple)
+[![dependencies Status](https://david-dm.org/voxpelli/node-connect-pg-simple/status.svg)](https://david-dm.org/voxpelli/node-connect-pg-simple)
+[![Known Vulnerabilities](https://snyk.io/test/github/voxpelli/node-connect-pg-simple/badge.svg?targetFile=package.json)](https://snyk.io/test/github/voxpelli/node-connect-pg-simple?targetFile=package.json)
 [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat)](https://github.com/Flet/semistandard)
 
 ## Installation
