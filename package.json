@@ -33,7 +33,7 @@
     "chai-as-promised": "7.1.1",
     "cookie-signature": "1.1.0",
     "cookiejar": "2.1.2",
-    "coveralls": "2.13.3",
+    "coveralls": "3.0.1",
     "denodeify": "1.2.1",
     "dependency-check": "2.10.1",
     "escape-string-regexp": "1.0.5",
