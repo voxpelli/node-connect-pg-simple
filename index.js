@@ -4,7 +4,9 @@ const util = require('util');
 const oneDay = 86400;
 
 const currentTimestamp = function () {
-  return Math.ceil(Date.now() / 1000);
+  let d = new Date(0);
+  d.setUTCSeconds(Math.ceil(Date.now() / 1000));
+  return d;
 };
 
 module.exports = function (session) {
@@ -91,7 +93,8 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.pruneSessions = function (fn) {
-    this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < to_timestamp($1)', [currentTimestamp()], function (err) {
+    console.log(currentTimestamp());
+    this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < $1::timestamp', [currentTimestamp()], function (err) {
       if (fn && typeof fn === 'function') {
         return fn(err);
       }
@@ -139,9 +142,12 @@ module.exports = function (session) {
     let ttl = this.ttl;
 
     ttl = ttl || (typeof maxAge === 'number' ? maxAge / 1000 : oneDay);
-    ttl = Math.ceil(ttl + currentTimestamp());
+    ttl = Math.ceil(ttl + (Math.ceil(Date.now() / 1000)));
 
-    return ttl;
+    let d = new Date(0);
+    d.setUTCSeconds(ttl);
+
+    return d;
   };
 
   /**
@@ -179,7 +185,7 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.get = function (sid, fn) {
-    this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= to_timestamp($2)', [sid, currentTimestamp()], function (err, data) {
+    this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= $2::timestamp', [sid, currentTimestamp()], function (err, data) {
       if (err) { return fn(err); }
       if (!data) { return fn(); }
       try {
@@ -202,11 +208,11 @@ module.exports = function (session) {
   PGStore.prototype.set = function (sid, sess, fn) {
     const self = this;
     const expireTime = this.getExpireTime(sess.cookie.maxAge);
-    const query = 'UPDATE ' + this.quotedTable() + ' SET sess = $1, expire = to_timestamp($2) WHERE sid = $3 RETURNING sid';
-
+    const query = 'UPDATE ' + this.quotedTable() + ' SET sess = $1, expire = $2::timestamp WHERE sid = $3 RETURNING sid';
+    console.log(expireTime)
     this.query(query, [sess, expireTime, sid], function (err, data) {
       if (!err && data === false) {
-        const query = 'INSERT INTO ' + self.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 WHERE NOT EXISTS (SELECT 1 FROM ' + self.quotedTable() + ' WHERE sid = $4)';
+        const query = 'INSERT INTO ' + self.quotedTable() + ' (sess, expire, sid) SELECT $1, $2::timestamp, $3 WHERE NOT EXISTS (SELECT 1 FROM ' + self.quotedTable() + ' WHERE sid = $4)';
 
         self.query(query, [sess, expireTime, sid, sid], function (err) {
           if (fn) { fn.apply(this, err); }
@@ -243,7 +249,7 @@ module.exports = function (session) {
     const expireTime = this.getExpireTime(sess.cookie.maxAge);
 
     this.query(
-      'UPDATE ' + this.quotedTable() + ' SET expire = to_timestamp($1) WHERE sid = $2 RETURNING sid',
+      'UPDATE ' + this.quotedTable() + ' SET expire = $1::timestamp WHERE sid = $2 RETURNING sid',
       [expireTime, sid],
       function (err) { fn(err); }
     );
