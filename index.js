@@ -93,7 +93,6 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.pruneSessions = function (fn) {
-    console.log(currentTimestamp());
     this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < $1::timestamp', [currentTimestamp()], function (err) {
       if (fn && typeof fn === 'function') {
         return fn(err);
