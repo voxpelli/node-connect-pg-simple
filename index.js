@@ -208,7 +208,6 @@ module.exports = function (session) {
     const self = this;
     const expireTime = this.getExpireTime(sess.cookie.maxAge);
     const query = 'UPDATE ' + this.quotedTable() + ' SET sess = $1, expire = $2::timestamp WHERE sid = $3 RETURNING sid';
-    console.log(expireTime)
     this.query(query, [sess, expireTime, sid], function (err, data) {
       if (!err && data === false) {
         const query = 'INSERT INTO ' + self.quotedTable() + ' (sess, expire, sid) SELECT $1, $2::timestamp, $3 WHERE NOT EXISTS (SELECT 1 FROM ' + self.quotedTable() + ' WHERE sid = $4)';
