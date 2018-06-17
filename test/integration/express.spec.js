@@ -40,17 +40,13 @@ describe('Express', function () {
     return app;
   };
 
-  let sandbox;
-
-  beforeEach(function () {
-    sandbox = sinon.sandbox.create();
-
+  beforeEach(() => {
     return dbUtils.removeTables()
       .then(() => dbUtils.initTables());
   });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
   });
 
   describe('main', function () {
@@ -120,7 +116,7 @@ describe('Express', function () {
       const app = appSetup(store);
       const agent = request.agent(app);
 
-      const clock = sandbox.useFakeTimers(Date.now());
+      const clock = sinon.useFakeTimers(Date.now());
 
       return queryPromise('SELECT COUNT(sid) FROM session')
         .should.eventually.have.nested.property('rows[0].count', '0')

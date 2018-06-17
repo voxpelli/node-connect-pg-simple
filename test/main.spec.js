@@ -11,13 +11,11 @@ const should = chai.should();
 describe('PGStore', function () {
   const connectPgSimple = require('../');
 
-  let sandbox, PGStore, options;
+  let PGStore, options;
 
-  beforeEach(function () {
-    sandbox = sinon.sandbox.create();
-
+  beforeEach(() => {
     PGStore = connectPgSimple({
-      Store: sandbox.stub()
+      Store: sinon.stub()
     });
 
     options = {
@@ -27,14 +25,14 @@ describe('PGStore', function () {
   });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
   });
 
   describe('pruneSessions', function () {
     let fakeClock;
 
     beforeEach(function () {
-      fakeClock = sandbox.useFakeTimers();
+      fakeClock = sinon.useFakeTimers();
     });
 
     it('should by default run on interval and close', function () {
@@ -42,9 +40,9 @@ describe('PGStore', function () {
 
       const store = new PGStore(options);
 
-      sandbox.spy(store, 'pruneSessions');
+      sinon.spy(store, 'pruneSessions');
 
-      const mock = sandbox.mock(store);
+      const mock = sinon.mock(store);
 
       mock.expects('query').twice().yields();
 
@@ -72,9 +70,9 @@ describe('PGStore', function () {
 
       const store = new PGStore(options);
 
-      sandbox.spy(store, 'pruneSessions');
+      sinon.spy(store, 'pruneSessions');
 
-      const mock = sandbox.mock(store);
+      const mock = sinon.mock(store);
 
       mock.expects('query').twice().yields();
 
@@ -96,9 +94,9 @@ describe('PGStore', function () {
     it('should not run when interval is disabled', function () {
       const store = new PGStore(options);
 
-      sandbox.spy(store, 'pruneSessions');
+      sinon.spy(store, 'pruneSessions');
 
-      const mock = sandbox.mock(store);
+      const mock = sinon.mock(store);
 
       mock.expects('query').never().yields();
 
@@ -168,7 +166,7 @@ describe('PGStore', function () {
       const proxiedConnectPgSimple = proxyquire('../', { pg: PGMock });
 
       ProxiedPGStore = proxiedConnectPgSimple({
-        Store: sandbox.stub()
+        Store: sinon.stub()
       });
 
       baseOptions = { pruneSessionInterval: false };
@@ -227,7 +225,7 @@ describe('PGStore', function () {
       const proxiedConnectPgSimple = proxyquire('../', { pg: PGMock });
 
       ProxiedPGStore = proxiedConnectPgSimple({
-        Store: sandbox.stub()
+        Store: sinon.stub()
       });
 
       baseOptions = { pruneSessionInterval: false };
