@@ -161,6 +161,7 @@ describe('PGStore', function () {
       delete process.env.DATABASE_URL;
 
       poolStub = sinon.stub();
+      poolStub.prototype.on = () => {};
 
       const PGMock = { Pool: poolStub };
       const proxiedConnectPgSimple = proxyquire('../', { pg: PGMock });

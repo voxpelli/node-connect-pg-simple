@@ -19,6 +19,8 @@ module.exports = function (session) {
 
     this.ttl = options.ttl;
 
+    this.errorLog = options.errorLog || console.error.bind(console);
+
     if (options.pool !== undefined) {
       this.pool = options.pool;
       this.ownsPg = false;
@@ -41,10 +43,11 @@ module.exports = function (session) {
       }
 
       this.pool = new (require('pg')).Pool(conObject);
+      this.pool.on('error', err => {
+        this.errorLog('PG Pool error:', err.message);
+      });
       this.ownsPg = true;
     }
-
-    this.errorLog = options.errorLog || console.error.bind(console);
 
     if (options.pruneSessionInterval === false) {
       this.pruneSessionInterval = false;
