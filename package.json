@@ -40,7 +40,7 @@
     "coveralls": "3.0.3",
     "denodeify": "1.2.1",
     "dependency-check": "3.3.0",
-    "dotenv": "6.2.0",
+    "dotenv": "8.0.0",
     "escape-string-regexp": "1.0.5",
     "eslint": "5.16.0",
     "eslint-config-semistandard": "13.0.0",
