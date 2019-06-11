@@ -25,6 +25,8 @@ psql mydatabase < node_modules/connect-pg-simple/table.sql
 
 Or simply play the file via a GUI, like the pgAdminIII queries tool.
 
+Note that `connect-pg-simple` requires PostgreSQL version 9.5 or above.
+
 ## Usage
 
 Examples are based on Express 4.
