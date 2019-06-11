@@ -5,13 +5,11 @@ sudo: false
 script: npm test
 after_success:
   - "cat coverage/lcov.info | ./node_modules/.bin/coveralls"
-addons:
-  postgresql: "9.3"
 matrix:
   include:
     - node_js: "8"
       addons:
-        postgresql: "9.3"
+        postgresql: "9.5"
     - node_js: "8"
       addons:
         postgresql: "9.6"
@@ -19,5 +17,8 @@ matrix:
       addons:
         postgresql: "9.6"
     - node_js: "10"
+      addons:
+        postgresql: "9.6"
+    - node_js: "node"  # latest stable
       addons:
         postgresql: "9.6"
