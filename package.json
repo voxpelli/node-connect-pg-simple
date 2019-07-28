@@ -17,7 +17,7 @@
     "pg": "^7.4.3"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=10.0.0"
   },
   "main": "index.js",
   "scripts": {
