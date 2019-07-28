@@ -7,23 +7,16 @@ after_success:
   - "cat coverage/lcov.info | ./node_modules/.bin/coveralls"
 matrix:
   include:
-    - node_js: "8"
-      addons:
-        postgresql: "9.5"
-    - node_js: "8"
-      addons:
-        postgresql: "9.6"
-    - node_js: "9"
+    - node_js: "12"
       addons:
         postgresql: "9.6"
     - node_js: "10"
       addons:
         postgresql: "9.6"
-    - node_js: "12"  # latest stable
-      addons:
-        postgresql: "9.6"
 jobs:
   include:
     - stage: static checks
-      node_js: 12
+      node_js: "12"
+      addons:
+        postgresql: "9.6"
       script: npm run check
