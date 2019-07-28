@@ -21,11 +21,14 @@
   },
   "main": "index.js",
   "scripts": {
-    "mocha-all": "NODE_ENV=test nyc --reporter=lcov --reporter text mocha test/*.spec.js test/*/*.spec.js --exit",
-    "mocha": "NODE_ENV=test nyc --reporter=lcov --reporter text mocha test/*.spec.js",
-    "dependency-check": "JS_FILES=\"*.js test/*.js test/*/*.js\" && dependency-check . $JS_FILES && dependency-check . $JS_FILES --unused --no-dev",
-    "test": "installed-check -e -i eslint && eslint . && npm run --silent dependency-check && npm run --silent mocha-all",
-    "test-light": "installed-check -e -i eslint && eslint . && npm run --silent dependency-check && npm run --silent mocha"
+    "check:dependency-check": "dependency-check *.js 'test/**/*.js' --no-dev",
+    "check:installed-check": "installed-check -e -i eslint",
+    "check:lint": "eslint .",
+    "check": "run-p check:*",
+    "light:mocha": "NODE_ENV=test nyc --reporter=lcov --reporter text mocha test/*.spec.js",
+    "test-light": "run-s check light:*",
+    "test:mocha": "NODE_ENV=test nyc --reporter=lcov --reporter text mocha test/*.spec.js test/*/*.spec.js --exit",
+    "test": "run-s check test:*"
   },
   "husky": {
     "hooks": {
@@ -39,7 +42,7 @@
     "cookiejar": "2.1.2",
     "coveralls": "3.0.4",
     "denodeify": "1.2.1",
-    "dependency-check": "3.3.0",
+    "dependency-check": "4.0.1",
     "dotenv": "8.0.0",
     "escape-string-regexp": "1.0.5",
     "eslint": "5.16.0",
@@ -54,6 +57,7 @@
     "husky": "2.7.0",
     "installed-check": "2.2.0",
     "mocha": "6.1.4",
+    "npm-run-all": "^4.1.5",
     "nyc": "14.1.1",
     "pg-promise": "8.7.2",
     "proxyquire": "2.1.0",
