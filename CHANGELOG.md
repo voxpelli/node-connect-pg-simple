@@ -1,9 +1,10 @@
 # Changelog
 
-## 6.0.0 (YYYY-MM-DD)
+## 6.0.0 (2019-07-28)
 
 * Breaking change: Now requires at least Node.js 10.x, this as Node.js 8.x [only have a short time left in its LTS](https://github.com/nodejs/Release)
 * Breaking change: This project now uses [`INSERT ... ON CONFLICT`](https://www.postgresql.org/docs/current/sql-insert.html#SQL-ON-CONFLICT), more popularly known as `UPSERT`. This is only supported on PostgreSQL version 9.5 and above.
+* Listen on pool errors. Fixes #29
 
 ## 5.0.0 (2018-06-06)
 
