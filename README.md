@@ -3,13 +3,13 @@
 A simple, minimal PostgreSQL session store for Express/Connect
 
 [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat)](https://github.com/Flet/semistandard)
-[![Build Status](https://travis-ci.org/voxpelli/node-connect-pg-simple.svg?branch=master)](https://travis-ci.org/voxpelli/node-connect-pg-simple)
+[![Build Status](https://travis-ci.com/voxpelli/node-connect-pg-simple.svg?branch=master)](https://travis-ci.com/voxpelli/node-connect-pg-simple)
 [![Coverage Status](https://coveralls.io/repos/voxpelli/node-connect-pg-simple/badge.svg)](https://coveralls.io/r/voxpelli/node-connect-pg-simple)
 [![dependencies Status](https://david-dm.org/voxpelli/node-connect-pg-simple/status.svg)](https://david-dm.org/voxpelli/node-connect-pg-simple)
 [![Known Vulnerabilities](https://snyk.io/test/github/voxpelli/node-connect-pg-simple/badge.svg?targetFile=package.json)](https://snyk.io/test/github/voxpelli/node-connect-pg-simple?targetFile=package.json)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvoxpelli%2Fnode-connect-pg-simple.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvoxpelli%2Fnode-connect-pg-simple?ref=badge_shield)
-[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/voxpelli/node-connect-pg-simple.svg)](http://isitmaintained.com/project/voxpelli/node-connect-pg-simple "Average time to resolve an issue")
-[![Percentage of issues still open](http://isitmaintained.com/badge/open/voxpelli/node-connect-pg-simple.svg)](http://isitmaintained.com/project/voxpelli/node-connect-pg-simple "Percentage of issues still open")
+[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/voxpelli/node-connect-pg-simple.svg)](https://isitmaintained.com/project/voxpelli/node-connect-pg-simple "Average time to resolve an issue")
+[![Percentage of issues still open](https://isitmaintained.com/badge/open/voxpelli/node-connect-pg-simple.svg)](https://isitmaintained.com/project/voxpelli/node-connect-pg-simple "Percentage of issues still open")
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/voxpelli/node-connect-pg-simple.svg?style=flat)](https://lgtm.com/projects/g/voxpelli/node-connect-pg-simple/context:javascript)
 
 
