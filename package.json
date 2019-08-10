@@ -41,7 +41,6 @@
     "cookie-signature": "^1.1.0",
     "cookiejar": "^2.1.2",
     "coveralls": "^3.0.6",
-    "denodeify": "^1.2.1",
     "dependency-check": "^4.1.0",
     "dotenv": "^8.0.0",
     "eslint": "^6.1.0",

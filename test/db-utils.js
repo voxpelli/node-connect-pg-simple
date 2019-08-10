@@ -10,12 +10,12 @@ const conObject = {
   database: process.env.PGDATABASE || 'connect_pg_simple_test'
 };
 
-const denodeify = require('denodeify');
+const { promisify } = require('util');
 const pg = require('pg');
 
 const pool = new pg.Pool(conObject);
 
-const readFile = denodeify(require('fs').readFile);
+const readFile = promisify(require('fs').readFile);
 
 const tables = ['session'];
 
