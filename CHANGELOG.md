@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.0.1 (2019-08-21)
+
+* Very minor security fix: `schemaName` and `tableName` wasn't escaped. If any of the two contained a string with a double quote in it, then that would enable an SQL injection. This was previously a feature of `tableName`, before the introduction of a separate `schemaName`, as that allowed a schema to be defined as part of `tableName`. Defining schema name through `tableName` is still supported after this fix, but is now *deprecated*.
+* Fix: Errors wasn't propagated properly. Fixed in #150. Thanks @bobnil!
+
 ## 6.0.0 (2019-07-28)
 
 * Breaking change: Now requires at least Node.js 10.x, this as Node.js 8.x [only have a short time left in its LTS](https://github.com/nodejs/Release)
