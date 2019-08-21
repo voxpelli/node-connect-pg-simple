@@ -7,6 +7,14 @@ const currentTimestamp = function () {
   return Math.ceil(Date.now() / 1000);
 };
 
+const quoteIdent = function (ident) {
+  return '"' + ident.replace(/"/g, '""') + '"';
+};
+
+const qualifiedTable = function (schema, table) {
+  return (schema ? quoteIdent(schema) + '.' : '') + quoteIdent(table);
+};
+
 module.exports = function (session) {
   const Store = session.Store || session.session.Store;
 
@@ -16,6 +24,9 @@ module.exports = function (session) {
 
     this.schemaName = options.schemaName || null;
     this.tableName = options.tableName || 'session';
+
+    // Concatenate schema and table name at initialization.
+    this.qualifiedTableName = qualifiedTable(this.schemaName, this.tableName);
 
     this.ttl = options.ttl;
 
@@ -94,7 +105,7 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.pruneSessions = function (fn) {
-    this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < to_timestamp($1)', [currentTimestamp()], function (err) {
+    this.query('DELETE FROM ' + this.qualifiedTableName + ' WHERE expire < to_timestamp($1)', [currentTimestamp()], function (err) {
       if (fn && typeof fn === 'function') {
         return fn(err);
       }
@@ -121,13 +132,7 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.quotedTable = function () {
-    let result = '"' + this.tableName + '"';
-
-    if (this.schemaName) {
-      result = '"' + this.schemaName + '".' + result;
-    }
-
-    return result;
+    return this.qualifiedTableName;
   };
 
   /**
@@ -182,7 +187,7 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.get = function (sid, fn) {
-    this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= to_timestamp($2)', [sid, currentTimestamp()], function (err, data) {
+    this.query('SELECT sess FROM ' + this.qualifiedTableName + ' WHERE sid = $1 AND expire >= to_timestamp($2)', [sid, currentTimestamp()], function (err, data) {
       if (err) { return fn(err); }
       if (!data) { return fn(); }
       try {
@@ -204,7 +209,7 @@ module.exports = function (session) {
 
   PGStore.prototype.set = function (sid, sess, fn) {
     const expireTime = this.getExpireTime(sess.cookie.maxAge);
-    const query = 'INSERT INTO ' + this.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 ON CONFLICT (sid) DO UPDATE SET sess=$1, expire=to_timestamp($2) RETURNING sid';
+    const query = 'INSERT INTO ' + this.qualifiedTableName + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 ON CONFLICT (sid) DO UPDATE SET sess=$1, expire=to_timestamp($2) RETURNING sid';
 
     this.query(query, [sess, expireTime, sid], function (err) {
       if (fn) { fn.call(this, err); }
@@ -219,7 +224,7 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.destroy = function (sid, fn) {
-    this.query('DELETE FROM ' + this.quotedTable() + ' WHERE sid = $1', [sid], function (err) {
+    this.query('DELETE FROM ' + this.qualifiedTableName + ' WHERE sid = $1', [sid], function (err) {
       if (fn) { fn(err); }
     });
   };
@@ -237,7 +242,7 @@ module.exports = function (session) {
     const expireTime = this.getExpireTime(sess.cookie.maxAge);
 
     this.query(
-      'UPDATE ' + this.quotedTable() + ' SET expire = to_timestamp($1) WHERE sid = $2 RETURNING sid',
+      'UPDATE ' + this.qualifiedTableName + ' SET expire = to_timestamp($1) WHERE sid = $2 RETURNING sid',
       [expireTime, sid],
       function (err) { fn(err); }
     );
