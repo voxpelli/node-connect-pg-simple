@@ -150,6 +150,16 @@ describe('PGStore', function () {
       options.tableName = 'barfoo.foobar';
       (new PGStore(options)).quotedTable().should.be.a('string').that.equals('"barfoo.foobar"');
     });
+
+    it('should escape table name', function () {
+      options.tableName = 'foo"ba"r';
+      (new PGStore(options)).quotedTable().should.be.a('string').that.equals('"foo""ba""r"');
+    });
+
+    it('should escape schema name', function () {
+      options.schemaName = 'b""ar"foo';
+      (new PGStore(options)).quotedTable().should.be.a('string').that.equals('"b""""ar""foo"."session"');
+    });
   });
 
   describe('configSetup', function () {

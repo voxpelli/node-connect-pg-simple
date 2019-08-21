@@ -7,6 +7,12 @@ const currentTimestamp = function () {
   return Math.ceil(Date.now() / 1000);
 };
 
+/**
+ * See
+ * @see https://www.postgresql.org/docs/9.5/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+ */
+const escapePgIdentifier = (value) => value.replace(/"/g, '""');
+
 module.exports = function (session) {
   const Store = session.Store || session.session.Store;
 
@@ -14,8 +20,13 @@ module.exports = function (session) {
     options = options || {};
     Store.call(this, options);
 
-    this.schemaName = options.schemaName || null;
-    this.tableName = options.tableName || 'session';
+    this.schemaName = options.schemaName ? escapePgIdentifier(options.schemaName) : null;
+    this.tableName = options.tableName ? escapePgIdentifier(options.tableName) : 'session';
+
+    if (!this.schemaName && this.tableName.includes('"."')) {
+      console.warn('DEPRECATION WARNING: Schema should be provided through its dedicated "schemaName" option rather than through "tableName"');
+      this.tableName = this.tableName.replace(/^([^"]+)""\.""([^"]+)$/, '$1"."$2');
+    }
 
     this.ttl = options.ttl;
 
