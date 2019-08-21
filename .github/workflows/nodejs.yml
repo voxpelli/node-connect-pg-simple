@@ -22,7 +22,7 @@ jobs:
       run: |
         npm install
         npm run build --if-present
-        npm test-light
+        npm run test-light
   lint:
     name: Static code analysis / Linting
     runs-on: ${{ matrix.os }}
@@ -42,4 +42,4 @@ jobs:
       run: |
         npm install
         npm run build --if-present
-        npm check
+        npm run check
