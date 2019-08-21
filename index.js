@@ -64,9 +64,7 @@ module.exports = function (session) {
       this.pruneSessionInterval = false;
     } else {
       this.pruneSessionInterval = (options.pruneSessionInterval || 60) * 1000;
-      setImmediate(function () {
-        this.pruneSessions();
-      }.bind(this));
+      setImmediate(() => { this.pruneSessions(); });
     }
   };
 
@@ -105,7 +103,7 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.pruneSessions = function (fn) {
-    this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < to_timestamp($1)', [currentTimestamp()], function (err) {
+    this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < to_timestamp($1)', [currentTimestamp()], err => {
       if (fn && typeof fn === 'function') {
         return fn(err);
       }
@@ -118,10 +116,10 @@ module.exports = function (session) {
         if (this.pruneTimer) {
           clearTimeout(this.pruneTimer);
         }
-        this.pruneTimer = setTimeout(this.pruneSessions.bind(this, true), this.pruneSessionInterval);
+        this.pruneTimer = setTimeout(() => { this.pruneSessions(); }, this.pruneSessionInterval);
         this.pruneTimer.unref();
       }
-    }.bind(this));
+    });
   };
 
   /**
@@ -193,7 +191,7 @@ module.exports = function (session) {
    */
 
   PGStore.prototype.get = function (sid, fn) {
-    this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= to_timestamp($2)', [sid, currentTimestamp()], function (err, data) {
+    this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= to_timestamp($2)', [sid, currentTimestamp()], (err, data) => {
       if (err) { return fn(err); }
       if (!data) { return fn(); }
       try {
@@ -201,7 +199,7 @@ module.exports = function (session) {
       } catch (e) {
         return this.destroy(sid, fn);
       }
-    }.bind(this));
+    });
   };
 
   /**
