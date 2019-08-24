@@ -30,8 +30,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         version: ${{ matrix.node_version }}
-    - name: npm ci
-      run: npm ci
+    - name: npm install
+      run: npm install
     - name: Mocha tests
       run: npm run test:mocha
     - name: Coveralls Parallel
