@@ -36,7 +36,7 @@ module.exports = function (session) {
       this.pool = options.pool;
       this.ownsPg = false;
     } else if (options.pgPromise !== undefined) {
-      if (typeof options.pgPromise.query !== 'function') {
+      if (!options.pgPromise.constructor || options.pgPromise.constructor.name !== 'Database') {
         throw new Error('`pgPromise` config must point to an existing and configured instance of pg-promise pointing at your database');
       }
       this.pgPromise = options.pgPromise;
@@ -172,7 +172,7 @@ module.exports = function (session) {
     }
 
     if (this.pgPromise) {
-      this.pgPromise.query(query, params || [])
+      this.pgPromise.any(query, params)
         .then(function (res) { fn && fn(null, res && res[0] ? res[0] : false); })
         .catch(function (err) { fn && fn(err, false); });
     } else {
