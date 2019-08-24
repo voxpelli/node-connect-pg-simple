@@ -4,25 +4,46 @@ on: [push]
 
 jobs:
   test:
-    name: Test on node ${{ matrix.node_version }} and ${{ matrix.os }}
+    name: Test on node ${{ matrix.node_version }} and ${{ matrix.os }} with Postgres ${{ matrix.postgres_version }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        node_version: [10, 12]
-        os: [ubuntu-latest, windows-latest]
-
+        node_version: [10]
+        os: [ubuntu-latest]
+        postgres_version: [12, 11, 10, 9.6]
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres_version }}
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+        # will assign a random free host port
+        - 5432/tcp
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
     - uses: actions/checkout@v1
     - name: Use Node.js ${{ matrix.node_version }}
       uses: actions/setup-node@v1
       with:
         version: ${{ matrix.node_version }}
-
-    - name: npm install, build and test
-      run: |
-        npm install
-        npm run build --if-present
-        npm run test-light
+    - name: npm ci
+      run: npm ci
+    - name: Mocha tests
+      run: npm run test:mocha
+    - name: Coveralls Parallel
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        parallel: true
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        parallel-finished: true
   lint:
     name: Static code analysis / Linting
     runs-on: ${{ matrix.os }}
