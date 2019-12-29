@@ -51,7 +51,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
     "express": "^4.17.1",
-    "express-session": "^1.16.2",
+    "express-session": "^1.17.0",
     "husky": "^3.1.0",
     "installed-check": "^3.0.0",
     "mocha": "^6.2.2",
