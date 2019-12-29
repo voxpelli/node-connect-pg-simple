@@ -11,6 +11,8 @@ const should = chai.should();
 describe('PGStore', function () {
   const connectPgSimple = require('../');
 
+  const DEFAULT_DELAY = 60000;
+
   let PGStore, options;
 
   beforeEach(() => {
@@ -35,38 +37,96 @@ describe('PGStore', function () {
       fakeClock = sinon.useFakeTimers();
     });
 
-    it('should by default run on interval and close', function () {
+    it('should by default run on randomized interval and close', async () => {
+      const MOCKED_RANDOM = 0.1;
+      const ACTUAL_DELAY = DEFAULT_DELAY / 2 + DEFAULT_DELAY * MOCKED_RANDOM;
+
       options.pruneSessionInterval = undefined;
 
-      const store = new PGStore(options);
+      // Mocks and setup
 
+      sinon.stub(Math, 'random').returns(MOCKED_RANDOM);
+
+      const store = new PGStore(options);
       sinon.spy(store, 'pruneSessions');
 
       const mock = sinon.mock(store);
-
       mock.expects('query').twice().yields();
 
-      return Promise.resolve()
-        .then(function () {
-          fakeClock.tick(1);
-        })
-        .then(function () {
-          store.pruneSessions.callCount.should.equal(1, 'Called from constructor');
-          fakeClock.tick(60000);
-        })
-        .then(function () {
-          store.pruneSessions.callCount.should.equal(2, 'Called by interval');
-          store.close();
-          fakeClock.tick(60000);
-        })
-        .then(function () {
-          store.pruneSessions.callCount.should.equal(2, 'Not called after close');
-          mock.verify();
-        });
+      // Execution
+
+      await fakeClock.tickAsync(1);
+
+      store.pruneSessions.callCount.should.equal(1, 'Called from constructor');
+
+      await fakeClock.tickAsync(ACTUAL_DELAY);
+
+      store.pruneSessions.callCount.should.equal(2, 'Called by interval');
+      store.close();
+
+      await fakeClock.tickAsync(ACTUAL_DELAY);
+
+      store.pruneSessions.callCount.should.equal(2, 'Not called after close');
+      mock.verify();
+    });
+
+    it('should use custom delay method when provided', async () => {
+      const ACTUAL_DELAY = 10000;
+
+      options.pruneSessionInterval = undefined;
+      options.pruneSessionRandomizedInterval = sinon.stub().returns(ACTUAL_DELAY);
+
+      // Mocks and setup
+
+      const store = new PGStore(options);
+      sinon.spy(store, 'pruneSessions');
+
+      const mock = sinon.mock(store);
+      mock.expects('query').twice().yields();
+
+      // Execution
+
+      await fakeClock.tickAsync(1);
+
+      store.pruneSessions.callCount.should.equal(1, 'Called from constructor');
+
+      await fakeClock.tickAsync(ACTUAL_DELAY);
+
+      store.pruneSessions.callCount.should.equal(2, 'Called by interval');
+      store.close();
+      mock.verify();
+
+      options.pruneSessionRandomizedInterval.should.have.been.calledTwice;
+    });
+
+    it('should run on exactly the default interval and close when no randomness', async () => {
+      options.pruneSessionInterval = undefined;
+      options.pruneSessionRandomizedInterval = false;
+
+      // Mocks and setup
+
+      const store = new PGStore(options);
+      sinon.spy(store, 'pruneSessions');
+
+      const mock = sinon.mock(store);
+      mock.expects('query').twice().yields();
+
+      // Execution
+
+      await fakeClock.tickAsync(1);
+
+      store.pruneSessions.callCount.should.equal(1, 'Called from constructor');
+
+      await fakeClock.tickAsync(DEFAULT_DELAY);
+
+      store.pruneSessions.callCount.should.equal(2, 'Called by interval');
+      store.close();
+      mock.verify();
     });
 
     it('should run on configurable interval', function () {
       options.pruneSessionInterval = 1;
+      options.pruneSessionRandomizedInterval = false;
 
       const store = new PGStore(options);
 

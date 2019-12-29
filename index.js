@@ -64,6 +64,13 @@ module.exports = function (session) {
       this.pruneSessionInterval = false;
     } else {
       this.pruneSessionInterval = (options.pruneSessionInterval || 60) * 1000;
+      if (options.pruneSessionRandomizedInterval !== false) {
+        this.pruneSessionRandomizedInterval = (
+          options.pruneSessionRandomizedInterval ||
+          // Results in at least 50% of the specified interval and at most 150%. Makes it so that multiple instances doesn't all prune at the same time.
+          (delay => Math.ceil(delay / 2 + delay * Math.random()))
+        );
+      }
       setImmediate(() => { this.pruneSessions(); });
     }
   };
@@ -96,6 +103,22 @@ module.exports = function (session) {
   };
 
   /**
+   * Get a new prune delay
+   *
+   * @return {number} the quoted schema + table for use in queries
+   * @access private
+   */
+
+  PGStore.prototype.getPruneDelay = function () {
+    const delay = this.pruneSessionInterval;
+
+    if (!delay) throw new Error('Can not calculate delay when pruning is inactivated');
+    if (this.pruneSessionRandomizedInterval) return this.pruneSessionRandomizedInterval(delay);
+
+    return delay;
+  };
+
+  /**
    * Does garbage collection for expired session in the database
    *
    * @param {Function} [fn] - standard Node.js callback called on completion
@@ -116,7 +139,10 @@ module.exports = function (session) {
         if (this.pruneTimer) {
           clearTimeout(this.pruneTimer);
         }
-        this.pruneTimer = setTimeout(() => { this.pruneSessions(); }, this.pruneSessionInterval);
+        this.pruneTimer = setTimeout(
+          () => { this.pruneSessions(); },
+          this.getPruneDelay()
+        );
         this.pruneTimer.unref();
       }
     });

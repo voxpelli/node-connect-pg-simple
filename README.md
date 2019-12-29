@@ -90,7 +90,8 @@ app.use(session({
 * **ttl** - the time to live for the session in the database – specified in seconds. Defaults to the cookie maxAge if the cookie has a maxAge defined and otherwise defaults to one day.
 * **schemaName** - if your session table is in another Postgres schema than the default (it normally isn't), then you can specify that here.
 * **tableName** - if your session table is named something else than `session`, then you can specify that here.
-* **pruneSessionInterval** - sets the delay in seconds at which expired sessions are pruned from the database. Default is `60` seconds. If set to `false` no automatic pruning will happen. Automatic pruning will happen `pruneSessionInterval` seconds after the last pruning – manual or automatic.
+* **pruneSessionInterval** - sets the delay in seconds at which expired sessions are pruned from the database. Default is `60` seconds. If set to `false` no automatic pruning will happen. By default every delay is randomized between 50% and 150% of set value, resulting in an average delay equal to the set value, but spread out to even the load on the database. Automatic pruning will happen `pruneSessionInterval` seconds after the last pruning (includes manual prunes).
+* **pruneSessionRandomizedInterval** – if set to `false`, then the exact value of `pruneSessionInterval` will be used in all delays. No randomization will happen. If multiple instances all start at once, disabling randomization can mean that multiple instances are all triggering pruning at once, causing unnecessary load on the database. Can also be set to a method, taking a numeric `delay` parameter and returning a modified one, thus allowing a custom delay algorithm if wanted.
 * **errorLog** – the method used to log errors in those cases where an error can't be returned to a callback. Defaults to `console.error()`, but can be useful to override if one eg. uses [Bunyan](https://github.com/trentm/node-bunyan) for logging.
 
 ## Useful methods
@@ -98,6 +99,6 @@ app.use(session({
 * **close()** – if this module used its own database module to connect to Postgres, then this will shut that connection down to allow a graceful shutdown.
 * **pruneSessions([callback(err)])** – will prune old sessions. Only really needed to be called if **pruneSessionInterval** has been set to `false` – which can be useful if one wants improved control of the pruning.
 
-
 ## License
+
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvoxpelli%2Fnode-connect-pg-simple.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvoxpelli%2Fnode-connect-pg-simple?ref=badge_large)

@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.1.0 (2019-12-29)
+
+* Feature: Prune intervals are now by default randomized between 50% and 150% of the set prune value, making the average prune interval be the same as before, but makes database load more even by making it unlikely for eg. many instances to all prune at once.
+* Feature: New option `pruneSessionRandomizedInterval` enables deactivation + customization of the new random prune interval feature.
+
 ## 6.0.1 (2019-08-21)
 
 * Very minor security fix: `schemaName` and `tableName` wasn't escaped. If any of the two contained a string with a double quote in it, then that would enable an SQL injection. This was previously a feature of `tableName`, before the introduction of a separate `schemaName`, as that allowed a schema to be defined as part of `tableName`. Defining schema name through `tableName` is still supported after this fix, but is now *deprecated*.
