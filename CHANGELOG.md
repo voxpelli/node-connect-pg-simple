@@ -4,6 +4,7 @@
 
 * Feature: Prune intervals are now by default randomized between 50% and 150% of the set prune value, making the average prune interval be the same as before, but makes database load more even by making it unlikely for eg. many instances to all prune at once.
 * Feature: New option `pruneSessionRandomizedInterval` enables deactivation + customization of the new random prune interval feature.
+* Change: Default prune interval is now `5` minutes, rather than `1` minute. No need to clean extremely often. Will probably make even longer eventually, but a more drastic change could be kind of a breaking change. Please comment in #162 with feedback on future default.
 
 ## 6.0.1 (2019-08-21)
 

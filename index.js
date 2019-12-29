@@ -2,6 +2,7 @@
 
 const util = require('util');
 const oneDay = 86400;
+const DEFAULT_PRUNE_INTERVAL_IN_SECONDS = 60 * 5;
 
 const currentTimestamp = function () {
   return Math.ceil(Date.now() / 1000);
@@ -63,7 +64,7 @@ module.exports = function (session) {
     if (options.pruneSessionInterval === false) {
       this.pruneSessionInterval = false;
     } else {
-      this.pruneSessionInterval = (options.pruneSessionInterval || 60) * 1000;
+      this.pruneSessionInterval = (options.pruneSessionInterval || DEFAULT_PRUNE_INTERVAL_IN_SECONDS) * 1000;
       if (options.pruneSessionRandomizedInterval !== false) {
         this.pruneSessionRandomizedInterval = (
           options.pruneSessionRandomizedInterval ||
