@@ -1,7 +1,9 @@
 {
-  "extends": "semistandard",
+  "extends": "standard",
   "root": true,
   "rules": {
+    "semi": [2, "always"],
+    "no-extra-semi": 2,
     "no-var": 2
   }
 }
