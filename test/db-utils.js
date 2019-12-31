@@ -1,3 +1,5 @@
+// @ts-check
+
 'use strict';
 
 const pathModule = require('path');
