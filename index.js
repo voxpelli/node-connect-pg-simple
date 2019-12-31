@@ -272,7 +272,7 @@ module.exports = function (session) {
       const query = 'INSERT INTO ' + this.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 ON CONFLICT (sid) DO UPDATE SET sess=$1, expire=to_timestamp($2) RETURNING sid';
 
       this.query(query, [sess, expireTime, sid], function (err) {
-        if (fn) { fn.call(this, err); }
+        if (fn) { fn(err); }
       });
     }
 
