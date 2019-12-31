@@ -1,18 +1,17 @@
 // @ts-check
+/// <reference types="node" />
 
 'use strict';
 
-const oneDay = 86400;
 const DEFAULT_PRUNE_INTERVAL_IN_SECONDS = 60 * 5;
+const ONE_DAY = 86400;
 
-const currentTimestamp = function () {
-  return Math.ceil(Date.now() / 1000);
-};
-
-// TODO: Import the express-session types
 /** @typedef {*} ExpressSession */
 /** @typedef {*} ExpressSessionStore */
 /** @typedef {import('pg').Pool} Pool */
+
+/** @returns {number} */
+const currentTimestamp = () => Math.ceil(Date.now() / 1000);
 
 /**
  * @see https://www.postgresql.org/docs/9.5/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
@@ -20,6 +19,26 @@ const currentTimestamp = function () {
  * @returns {string}
  */
 const escapePgIdentifier = (value) => value.replace(/"/g, '""');
+
+/** @typedef {(err?: Error|undefined) => void} SimpleErrorCallback */
+/**
+ * @template T
+ * @callback SimpleValueCallback
+ * @param {Error|undefined} [err]
+ * @param {T} [value]
+ */
+
+/**
+ * @param {Error} err
+ * @param {SimpleErrorCallback} [fn]
+ * @throws {Error}
+ */
+const errorToCallbackAndReject = (err, fn) => {
+  if (fn) fn(err);
+  throw err;
+};
+
+/** @typedef {*} SessionObject */
 
 /** @typedef {(delay: number) => number} PGStorePruneDelayRandomizer */
 /** @typedef {Object<string, any>} PGStoreQueryResult */
@@ -44,7 +63,11 @@ const escapePgIdentifier = (value) => value.replace(/"/g, '""');
  * @returns {ExpressSessionStore}
  */
 module.exports = function (session) {
-  const Store = session.Store || session.session.Store;
+  /** @type {ExpressSessionStore} */
+  const Store = session.Store ||
+    // @ts-ignore
+    session.session.Store;
+
   class PGStore extends Store {
     /**
      * @param {PGStoreOptions} options
@@ -180,7 +203,7 @@ module.exports = function (session) {
     /**
      * Get the quoted table.
      *
-     * @returns {String} the quoted schema + table for use in queries
+     * @returns {string} the quoted schema + table for use in queries
      * @access private
      */
 
@@ -197,15 +220,15 @@ module.exports = function (session) {
     /**
      * Figure out when a session should expire
      *
-     * @param {Number} [maxAge] - the maximum age of the session cookie
-     * @returns {Number} the unix timestamp, in seconds
+     * @param {number} [maxAge] - the maximum age of the session cookie
+     * @returns {number} the unix timestamp, in seconds
      * @access private
      */
 
     getExpireTime (maxAge) {
       let ttl = this.ttl;
 
-      ttl = ttl || (typeof maxAge === 'number' ? maxAge / 1000 : oneDay);
+      ttl = ttl || (typeof maxAge === 'number' ? maxAge / 1000 : ONE_DAY);
       ttl = Math.ceil(ttl + currentTimestamp());
 
       return ttl;
@@ -214,34 +237,41 @@ module.exports = function (session) {
     /**
      * Query the database.
      *
-     * @param {String} query - the database query to perform
-     * @param {(Array|Function)} [params] - the parameters of the query or the callback function
-     * @param {Function} [fn] - standard Node.js callback returning the resulting rows
+     * @param {string} query - the database query to perform
+     * @param {any[]|PGStoreQueryCallback} [params] - the parameters of the query or the callback function
+     * @param {PGStoreQueryCallback} [fn] - standard Node.js callback returning the resulting rows
+     * @returns {Promise<PGStoreQueryResult>}
      * @access private
      */
-
-    query (query, params, fn) {
+    async query (query, params, fn) {
       if (typeof params === 'function') {
-        if (fn) throw new Error('Two callback functions set at once');
-        fn = params;
+        fn = fn || params;
         params = [];
       }
 
-      if (this.pgPromise) {
-        this.pgPromise.query(query, params || [])
-          .then(function (res) { fn && fn(null, res && res[0] ? res[0] : false); })
-          .catch(function (err) { fn && fn(err, false); });
-      } else {
-        this.pool.query(query, params || [], function (err, res) {
-          if (fn) { fn(err, res && res.rows[0] ? res.rows[0] : false); }
-        });
+      let result;
+
+      try {
+        if (this.pgPromise) {
+          const res = await this.pgPromise.query(query, params || []);
+          result = res && res[0] ? res[0] : false;
+        } else {
+          const res = await this.pool.query(query, params || []);
+          result = res && res.rows[0] ? res.rows[0] : false;
+        }
+      } catch (err) {
+        errorToCallbackAndReject(err);
       }
+
+      if (fn) fn(undefined, result);
+
+      return result;
     }
 
     /**
      * Attempt to fetch session by the given `sid`.
      *
-     * @param {String} sid – the session id
+     * @param {string} sid – the session id
      * @param {Function} fn – a standard Node.js callback returning the parsed session object
      * @access public
      */
@@ -261,9 +291,9 @@ module.exports = function (session) {
     /**
      * Commit the given `sess` object associated with the given `sid`.
      *
-     * @param {String} sid – the session id
+     * @param {string} sid – the session id
      * @param {Object} sess – the session object to store
-     * @param {Function} fn – a standard Node.js callback returning the parsed session object
+     * @param {SimpleErrorCallback} fn – a standard Node.js callback returning the parsed session object
      * @access public
      */
 
@@ -273,13 +303,14 @@ module.exports = function (session) {
 
       this.query(query, [sess, expireTime, sid], function (err) {
         if (fn) { fn(err); }
+        fn();
       });
     }
 
     /**
      * Destroy the session associated with the given `sid`.
      *
-     * @param {String} sid – the session id
+     * @param {string} sid – the session id
      * @access public
      */
 
@@ -292,7 +323,7 @@ module.exports = function (session) {
     /**
      * Touch the given session object associated with the given session ID.
      *
-     * @param {String} sid – the session id
+     * @param {string} sid – the session id
      * @param {Object} sess – the session object to store
      * @param {Function} fn – a standard Node.js callback returning the parsed session object
      * @access public
