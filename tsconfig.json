@@ -12,13 +12,12 @@
     "allowJs": true,
     "resolveJsonModule": true,
     "noEmit": true,
-    "maxNodeModuleJsDepth": 2,
 
     /* Strict Type-Checking Options */
     "strict": true,
     "noImplicitThis": false,
     "noImplicitAny": false,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
 
     /* Additional Checks */
     "noUnusedLocals": true

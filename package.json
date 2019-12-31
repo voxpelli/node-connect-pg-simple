@@ -14,6 +14,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@types/pg": "^7.14.0",
     "pg": "^7.4.3"
   },
   "engines": {
@@ -21,7 +22,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "check:dependency-check": "dependency-check *.js 'test/**/*.js' --no-dev",
+    "check:dependency-check": "dependency-check *.js 'test/**/*.js' --no-dev -i @types/pg",
     "check:installed-check": "installed-check -i eslint",
     "check:lint": "eslint .",
     "check:tsc": "tsc",
@@ -44,12 +45,11 @@
     "@types/express-session": "^1.15.16",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10.0.0",
-    "@types/pg": "^7.14.0",
     "@types/proxyquire": "^1.3.28",
     "@types/sinon": "^7.5.1",
     "@types/sinon-chai": "^3.2.3",
     "@types/supertest": "^2.0.8",
-    "@voxpelli/eslint-config": "^2.0.0",
+    "@voxpelli/eslint-config": "^2.0.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "cookie-signature": "^1.1.0",

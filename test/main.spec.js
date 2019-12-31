@@ -19,7 +19,7 @@ describe('PGStore', function () {
 
   beforeEach(() => {
     PGStore = connectPgSimple({
-      Store: sinon.stub()
+      Store: class FakeStore {}
     });
 
     options = {
@@ -239,7 +239,7 @@ describe('PGStore', function () {
       const proxiedConnectPgSimple = proxyquire('../', { pg: PGMock });
 
       ProxiedPGStore = proxiedConnectPgSimple({
-        Store: sinon.stub()
+        Store: class FakeStore {}
       });
 
       baseOptions = { pruneSessionInterval: false };
@@ -298,7 +298,7 @@ describe('PGStore', function () {
       const proxiedConnectPgSimple = proxyquire('../', { pg: PGMock });
 
       ProxiedPGStore = proxiedConnectPgSimple({
-        Store: sinon.stub()
+        Store: class FakeStore {}
       });
 
       baseOptions = { pruneSessionInterval: false };
