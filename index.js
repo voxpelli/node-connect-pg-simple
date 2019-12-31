@@ -1,3 +1,5 @@
+// @ts-check
+
 'use strict';
 
 const util = require('util');
@@ -63,8 +65,10 @@ module.exports = function (session) {
     }
 
     if (options.pruneSessionInterval === false) {
+      /** @type {false|number} */
       this.pruneSessionInterval = false;
     } else {
+      /** @type {false|number} */
       this.pruneSessionInterval = (options.pruneSessionInterval || DEFAULT_PRUNE_INTERVAL_IN_SECONDS) * 1000;
       if (options.pruneSessionRandomizedInterval !== false) {
         this.pruneSessionRandomizedInterval = (
