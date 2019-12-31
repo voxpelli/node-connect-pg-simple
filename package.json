@@ -26,9 +26,9 @@
     "check:lint": "eslint .",
     "check:tsc": "tsc",
     "check": "run-p check:*",
-    "light:mocha": "NODE_ENV=test nyc --reporter=lcov --reporter text mocha test/*.spec.js",
+    "light:mocha": "nyc --reporter=lcov --reporter text mocha test/*.spec.js",
     "test-light": "run-s check light:*",
-    "test:mocha": "NODE_ENV=test nyc --reporter=lcov --reporter text mocha test/*.spec.js test/*/*.spec.js --exit",
+    "test:mocha": "nyc --reporter=lcov --reporter text mocha 'test/**/*.spec.js' --exit",
     "test": "run-s check test:*"
   },
   "husky": {
