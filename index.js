@@ -9,8 +9,9 @@ const currentTimestamp = function () {
 };
 
 /**
- * See
  * @see https://www.postgresql.org/docs/9.5/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+ * @param {string} value
+ * @returns {string}
  */
 const escapePgIdentifier = (value) => value.replace(/"/g, '""');
 
@@ -106,7 +107,7 @@ module.exports = function (session) {
   /**
    * Get a new prune delay
    *
-   * @return {number} the quoted schema + table for use in queries
+   * @returns {number} the quoted schema + table for use in queries
    * @access private
    */
 
@@ -152,7 +153,7 @@ module.exports = function (session) {
   /**
    * Get the quoted table.
    *
-   * @return {String} the quoted schema + table for use in queries
+   * @returns {String} the quoted schema + table for use in queries
    * @access private
    */
 
@@ -170,7 +171,7 @@ module.exports = function (session) {
    * Figure out when a session should expire
    *
    * @param {Number} [maxAge] - the maximum age of the session cookie
-   * @return {Number} the unix timestamp, in seconds
+   * @returns {Number} the unix timestamp, in seconds
    * @access private
    */
 
