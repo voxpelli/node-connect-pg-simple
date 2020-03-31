@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/pg": "^7.14.1",
-    "pg": "^7.4.3"
+    "pg": "^8.0.0"
   },
   "engines": {
     "node": ">=10.0.0"
