@@ -6,6 +6,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
 const proxyquire = require('proxyquire').noPreserveCache().noCallThru();
+
 chai.use(sinonChai);
 
 const should = chai.should();
@@ -337,6 +338,53 @@ describe('PGStore', function () {
       queryStub.should.have.been.calledOnce;
       queryStub.firstCall.args[0].should.equal('select');
       queryStub.firstCall.args[1].should.deep.equal([1, 2]);
+    });
+  });
+
+  describe('test create table', function () {
+    let poolStub;
+    let ProxiedPGStore;
+    let baseOptions;
+    let promiseMock;
+    let queryStub;
+
+    beforeEach(function () {
+      delete process.env.DATABASE_URL;
+
+      poolStub = sinon.stub();
+
+      const PGMock = { Pool: poolStub };
+      const proxiedConnectPgSimple = proxyquire('../', { pg: PGMock });
+
+      ProxiedPGStore = proxiedConnectPgSimple({
+        Store: class FakeStore {}
+      });
+
+      queryStub = sinon.stub();
+    });
+
+    it('should create table.', async function () {
+      queryStub.onFirstCall().returns([{ rows: [{ to_regclass: null }] }]);
+      queryStub.onSecondCall().returns(true);
+      baseOptions = { pruneSessionInterval: false, tableName: 'TEST_TABLE' };
+      promiseMock = { query: queryStub };
+      const store = new ProxiedPGStore(Object.assign(baseOptions, { pgPromise: promiseMock }));
+      await store.createSessionStoreTable();
+      sinon.assert.calledTwice(queryStub);
+
+      queryStub.firstCall.args[0].should.be.a('string').that.equals('SELECT to_regclass($1::text)');
+      queryStub.firstCall.args[1].should.be.deep.equals(['"TEST_TABLE"']);
+
+      console.log('first arg', queryStub.secondCall.firstArg);
+      console.log('last arg', queryStub.secondCall.lastArg);
+      sinon.assert.match(queryStub.secondCall.lastArg, []);
+
+      const { promisify } = require('util');
+      const readFile = promisify(require('fs').readFile);
+      const tableDefString = await readFile('table_dynamic.sql', 'utf8');
+      const tableDefModified = tableDefString.replace(/<TABLE_NAME>/g, '"TEST_TABLE"');
+      queryStub.secondCall.args[0].should.be.a('string').that.equals(tableDefModified);
+      queryStub.secondCall.args[1].should.be.deep.equals([]);
     });
   });
 });

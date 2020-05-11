@@ -21,6 +21,8 @@ const readFile = promisify(require('fs').readFile);
 
 const tables = ['session'];
 
+const createTable = true;
+
 const removeTables = function () {
   return Promise.all(tables.map(table => pool.query('DROP TABLE IF EXISTS ' + table)));
 };
@@ -34,5 +36,6 @@ module.exports = Object.freeze({
   conObject,
   queryPromise: pool.query.bind(pool),
   removeTables,
-  initTables
+  initTables,
+  createTable
 });

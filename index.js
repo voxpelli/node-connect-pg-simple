@@ -48,6 +48,7 @@ const errorToCallbackAndReject = (err, fn) => {
  * @typedef PGStoreOptions
  * @property {string} [schemaName]
  * @property {string} [tableName]
+ * @property {boolean} [createTable]
  * @property {number} [ttl]
  * @property {typeof console.error} [errorLog]
  * @property {Pool} [pool]
@@ -108,7 +109,6 @@ module.exports = function (session) {
             conObject.connectionString = conString;
           }
         }
-
         this.pool = new (require('pg')).Pool(conObject);
         this.pool.on('error', err => {
           this.errorLog('PG Pool error:', err.message);
@@ -116,6 +116,11 @@ module.exports = function (session) {
         this.ownsPg = true;
       }
 
+      /** @type {boolean} */
+      this.createTable = options.createTable ? options.createTable : false;
+      if (this.createTable) {
+        setImmediate(() => this.createSessionStoreTable());
+      }
       if (options.pruneSessionInterval === false) {
         /** @type {false|number} */
         this.pruneSessionInterval = false;
@@ -130,6 +135,19 @@ module.exports = function (session) {
           );
         }
         setImmediate(() => { this.pruneSessions(); });
+      }
+    }
+
+    async createSessionStoreTable () {
+      const queryString = 'SELECT to_regclass($1::text)';
+      const res = await this.query(queryString, [this.quotedTable()]);
+      if (res !== undefined && res.rows[0].to_regclass === null) {
+        const { promisify } = require('util');
+        const readFile = promisify(require('fs').readFile);
+        const tableDefString = await readFile('table_dynamic.sql', 'utf8');
+        const tableDefModified = tableDefString.replace(/<TABLE_NAME>/g, this.quotedTable());
+
+        await this.query(tableDefModified);
       }
     }
 
