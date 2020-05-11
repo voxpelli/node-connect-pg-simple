@@ -6,6 +6,7 @@ const chai = require('chai');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
 const proxyquire = require('proxyquire').noPreserveCache().noCallThru();
+
 chai.use(sinonChai);
 
 const should = chai.should();
@@ -438,7 +439,7 @@ describe('PGStore', () => {
       });
     });
 
-    it('should pass parameters to pgPromise', () => {
+    it('should pass parameters to pgPromise', async () => {
       const queryStub = sinon.stub().resolves(true);
       const pgPromiseStub = {
         query: queryStub
@@ -448,7 +449,7 @@ describe('PGStore', () => {
         pgPromise: pgPromiseStub
       }));
 
-      store.query('select', [1, 2]);
+      await store._asyncQuery('select', [1, 2]);
 
       queryStub.should.have.been.calledOnce;
       queryStub.firstCall.args[0].should.equal('select');

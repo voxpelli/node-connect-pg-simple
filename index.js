@@ -32,6 +32,7 @@ const escapePgIdentifier = (value) => value.replace(/"/g, '""');
  * @typedef PGStoreOptions
  * @property {string} [schemaName]
  * @property {string} [tableName]
+ * @property {boolean} [createTableIfMissing]
  * @property {number} [ttl]
  * @property {boolean} [disableTouch]
  * @property {typeof console.error} [errorLog]
@@ -67,6 +68,10 @@ module.exports = function (session) {
         this.tableName = this.tableName.replace(/^([^"]+)""\.""([^"]+)$/, '$1"."$2');
       }
 
+      this.createTableIfMissing = !!options.createTableIfMissing;
+      /** @type {Promise<void>|undefined} */
+      this.tableCreationPromise = undefined;
+
       this.ttl = options.ttl;
       this.disableTouch = !!options.disableTouch;
 
@@ -92,7 +97,6 @@ module.exports = function (session) {
             conObject.connectionString = conString;
           }
         }
-
         this.pool = new (require('pg')).Pool(conObject);
         this.pool.on('error', err => {
           this.errorLog('PG Pool error:', err.message);
@@ -115,6 +119,46 @@ module.exports = function (session) {
         }
         setImmediate(() => { this.pruneSessions(); });
       }
+    }
+
+    /**
+     * Ensures the session store table exists, creating it if its missing
+     *
+     * @access private
+     * @returns {Promise<void>}
+     */
+    async _rawEnsureSessionStoreTable () {
+      const quotedTable = this.quotedTable();
+
+      const res = await this._asyncQuery('SELECT to_regclass($1::text)', [quotedTable], true);
+
+      if (res && res.to_regclass === null) {
+        const pathModule = require('path');
+        const fs = require('fs').promises;
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        const tableDefString = await fs.readFile(pathModule.resolve(__dirname, './table.sql'), 'utf8');
+        const tableDefModified = tableDefString.replace(/"session"/g, quotedTable);
+
+        await this._asyncQuery(tableDefModified, [], true);
+      }
+    }
+
+    /**
+     * Ensures the session store table exists, creating it if its missing
+     *
+     * @access private
+     * @param {boolean|undefined} noTableCreation
+     * @returns {Promise<void>}
+     */
+    async _ensureSessionStoreTable (noTableCreation) {
+      if (noTableCreation || this.createTableIfMissing === false) return;
+
+      if (!this.tableCreationPromise) {
+        this.tableCreationPromise = this._rawEnsureSessionStoreTable();
+      }
+
+      return this.tableCreationPromise;
     }
 
     /**
@@ -222,19 +266,44 @@ module.exports = function (session) {
      * Query the database.
      *
      * @param {string} query - the database query to perform
-     * @param {any[]|PGStoreQueryCallback} [params] - the parameters of the query or the callback function
-     * @param {PGStoreQueryCallback} [fn] - standard Node.js callback returning the resulting rows
+     * @param {any[]} [params] - the parameters of the query
+     * @param {boolean} [noTableCreation]
+     * @returns {Promise<PGStoreQueryResult|undefined>}
      * @access private
      */
-    query (query, params, fn) {
+    async _asyncQuery (query, params, noTableCreation) {
+      return new Promise((resolve, reject) => {
+        this.query(query, params, (err, result) => {
+          err ? reject(err) : resolve(result);
+        }, noTableCreation);
+      });
+    }
+
+    /**
+     * Query the database.
+     *
+     * @param {string} query - the database query to perform
+     * @param {any[]|PGStoreQueryCallback} [params] - the parameters of the query or the callback function
+     * @param {PGStoreQueryCallback} [fn] - standard Node.js callback returning the resulting rows
+     * @param {boolean} [noTableCreation]
+     * @returns {void}
+     * @access private
+     */
+    query (query, params, fn, noTableCreation) {
+      /** @type {any[]} */
+      let resolvedParams;
+
       if (typeof params === 'function') {
         if (fn) throw new Error('Two callback functions set at once');
         fn = params;
-        params = [];
+        resolvedParams = [];
+      } else {
+        resolvedParams = params || [];
       }
 
       if (this.pgPromise) {
-        this.pgPromise.query(query, params || [])
+        this._ensureSessionStoreTable(noTableCreation)
+          .then(() => this.pgPromise.query(query, resolvedParams))
           .then(
             /** @param {PGStoreQueryResult} res */
             // eslint-disable-next-line unicorn/no-null
@@ -245,12 +314,21 @@ module.exports = function (session) {
             err => { fn && fn(err); }
           );
       } else {
-        if (!this.pool) throw new Error('Pool missing for some reason');
-        this.pool.query(
-          query,
-          params || [],
-          (err, res) => { fn && fn(err, res && res.rows[0] ? res.rows[0] : undefined); }
-        );
+        this._ensureSessionStoreTable(noTableCreation)
+          .then(() => {
+            if (!this.pool) throw new Error('Pool missing for some reason');
+            this.pool.query(
+              query,
+              resolvedParams,
+              (err, res) => {
+                fn && fn(err, res && res.rows && res.rows[0] ? res.rows[0] : undefined);
+              }
+            );
+          })
+          .catch(
+            /** @param {Error} err */
+            err => { fn && fn(err); }
+          );
       }
     }
 

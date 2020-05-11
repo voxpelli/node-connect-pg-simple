@@ -19,14 +19,16 @@ const pool = new pg.Pool(conObject);
 
 const tables = ['session'];
 
+/** @returns {Promise<void>} */
 const removeTables = async () => {
-  return Promise.all(tables.map(table => pool.query('DROP TABLE IF EXISTS ' + table)));
+  await Promise.all(tables.map(table => pool.query('DROP TABLE IF EXISTS ' + table)));
 };
 
+/** @returns {Promise<void>} */
 const initTables = async () => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const tableDef = await fs.readFile(pathModule.resolve(__dirname, '../table.sql'), 'utf8');
-  return pool.query(tableDef);
+  await pool.query(tableDef);
 };
 
 module.exports = Object.freeze({

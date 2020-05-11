@@ -47,9 +47,9 @@ describe('pgPromise', () => {
     return app;
   };
 
-  beforeEach(() => {
-    return dbUtils.removeTables()
-      .then(() => dbUtils.initTables());
+  beforeEach(async () => {
+    await dbUtils.removeTables();
+    await dbUtils.initTables();
   });
 
   afterEach(() => {
