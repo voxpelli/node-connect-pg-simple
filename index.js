@@ -49,6 +49,7 @@ const errorToCallbackAndReject = (err, fn) => {
  * @property {string} [schemaName]
  * @property {string} [tableName]
  * @property {number} [ttl]
+ * @property {false|string} [secret]
  * @property {typeof console.error} [errorLog]
  * @property {Pool} [pool]
  * @property {*} [pgPromise]
@@ -85,6 +86,11 @@ module.exports = function (session) {
       }
 
       this.ttl = options.ttl;
+
+      if (options.secret) {
+        this.secret = options.secret;
+        this.kruptein = require('kruptein')(options);
+      }
 
       this.errorLog = options.errorLog || console.error.bind(console);
 
@@ -281,6 +287,12 @@ module.exports = function (session) {
         if (err) { return fn(err); }
         if (!data) { return fn(); }
         try {
+          if (this.secret) {
+            this.kruptein.get(this.secret, JSON.stringify(data.sess), (err, pt) => {
+              if (err) return fn(err);
+              data.sess = JSON.parse(pt);
+            });
+          }
           return fn(null, (typeof data.sess === 'string') ? JSON.parse(data.sess) : data.sess);
         } catch (e) {
           return this.destroy(sid, fn);
@@ -299,8 +311,13 @@ module.exports = function (session) {
 
     set (sid, sess, fn) {
       const expireTime = this.getExpireTime(sess.cookie.maxAge);
+      if (this.secret) {
+        this.kruptein.set(this.secret, sess, (err, ct) => {
+          if (err) return fn(err);
+          sess = ct;
+        });
+      }
       const query = 'INSERT INTO ' + this.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 ON CONFLICT (sid) DO UPDATE SET sess=$1, expire=to_timestamp($2) RETURNING sid';
-
       this.query(query, [sess, expireTime, sid], function (err) {
         if (fn) { fn(err); }
         fn();
