@@ -303,7 +303,6 @@ module.exports = function (session) {
 
       this.query(query, [sess, expireTime, sid], function (err) {
         if (fn) { fn(err); }
-        fn();
       });
     }
 
