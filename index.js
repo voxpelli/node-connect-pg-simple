@@ -3,7 +3,7 @@
 
 'use strict';
 
-const DEFAULT_PRUNE_INTERVAL_IN_SECONDS = 60 * 5;
+const DEFAULT_PRUNE_INTERVAL_IN_SECONDS = 60 * 15;
 const ONE_DAY = 86400;
 
 /** @typedef {*} ExpressSession */

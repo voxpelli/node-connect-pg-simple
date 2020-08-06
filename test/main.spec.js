@@ -13,7 +13,7 @@ const should = chai.should();
 describe('PGStore', function () {
   const connectPgSimple = require('../');
 
-  const DEFAULT_DELAY = 60 * 5 * 1000;
+  const DEFAULT_DELAY = 60 * 15 * 1000;
 
   let PGStore, options;
 
