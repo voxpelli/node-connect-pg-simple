@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.2.0 (2020-08-06)
+
+* Important fix: Bump pg to 8.2.1 to support node 14+
+* Change: Change default prine interval to 15 mins
+* Test: Add Node 14 to GitHub CI
+* Test: Added more types and type linting
+
 ## 6.1.0 (2019-12-29)
 
 * Feature: Prune intervals are now by default randomized between 50% and 150% of the set prune value, making the average prune interval be the same as before, but makes database load more even by making it unlikely for eg. many instances to all prune at once.
