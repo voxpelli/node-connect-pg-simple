@@ -10,7 +10,6 @@ A simple, minimal PostgreSQL session store for Express/Connect
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/voxpelli/node-connect-pg-simple.svg)](https://isitmaintained.com/project/voxpelli/node-connect-pg-simple "Average time to resolve an issue")
 [![Percentage of issues still open](https://isitmaintained.com/badge/open/voxpelli/node-connect-pg-simple.svg)](https://isitmaintained.com/project/voxpelli/node-connect-pg-simple "Percentage of issues still open")
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/voxpelli/node-connect-pg-simple.svg?style=flat)](https://lgtm.com/projects/g/voxpelli/node-connect-pg-simple/context:javascript)
-[![Gitter](https://badges.gitter.im/connect-pg-simple/community.svg)](https://gitter.im/connect-pg-simple/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 
 ## Installation
