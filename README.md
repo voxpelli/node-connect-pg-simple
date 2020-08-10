@@ -102,3 +102,9 @@ app.use(session({
 ## License
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvoxpelli%2Fnode-connect-pg-simple.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvoxpelli%2Fnode-connect-pg-simple?ref=badge_large)
+
+## For enterprise
+
+Available as part of the Tidelift Subscription.
+
+The maintainers of connect-pg-simple and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source packages you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact packages you use. [Learn more.](https://tidelift.com/subscription/pkg/npm-connect-pg-simple?utm_source=npm-connect-pg-simple&utm_medium=referral&utm_campaign=enterprise&utm_term=repo)
