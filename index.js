@@ -28,16 +28,6 @@ const escapePgIdentifier = (value) => value.replace(/"/g, '""');
  * @param {T} [value]
  */
 
-/**
- * @param {Error} err
- * @param {SimpleErrorCallback} [fn]
- * @throws {Error}
- */
-const errorToCallbackAndReject = (err, fn) => {
-  if (fn) fn(err);
-  throw err;
-};
-
 /** @typedef {*} SessionObject */
 
 /** @typedef {(delay: number) => number} PGStorePruneDelayRandomizer */
@@ -260,7 +250,9 @@ module.exports = function (session) {
           result = res && res.rows[0] ? res.rows[0] : false;
         }
       } catch (err) {
-        errorToCallbackAndReject(err);
+        if (fn) return fn(err);
+
+        throw err;
       }
 
       if (fn) fn(undefined, result);
