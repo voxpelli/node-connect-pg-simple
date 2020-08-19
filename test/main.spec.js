@@ -10,12 +10,15 @@ chai.use(sinonChai);
 
 const should = chai.should();
 
-describe('PGStore', function () {
-  const connectPgSimple = require('../');
+const connectPgSimple = require('..');
 
+describe('PGStore', function () {
   const DEFAULT_DELAY = 60 * 15 * 1000;
 
-  let PGStore, options;
+  /** @type {import('..').ExpressSessionStore} */
+  let PGStore;
+  /** @type {import('..').PGStoreOptions} */
+  let options;
 
   beforeEach(() => {
     PGStore = connectPgSimple({
@@ -23,6 +26,7 @@ describe('PGStore', function () {
     });
 
     options = {
+      // @ts-ignore
       pool: {},
       pruneSessionInterval: false
     };
@@ -33,6 +37,7 @@ describe('PGStore', function () {
   });
 
   describe('pruneSessions', function () {
+    /** @type {import('sinon').SinonFakeTimers} */
     let fakeClock;
 
     beforeEach(function () {
@@ -43,7 +48,7 @@ describe('PGStore', function () {
       const MOCKED_RANDOM = 0.1;
       const ACTUAL_DELAY = DEFAULT_DELAY / 2 + DEFAULT_DELAY * MOCKED_RANDOM;
 
-      options.pruneSessionInterval = undefined;
+      delete options.pruneSessionInterval;
 
       // Mocks and setup
 
@@ -75,7 +80,7 @@ describe('PGStore', function () {
     it('should use custom delay method when provided', async () => {
       const ACTUAL_DELAY = 10000;
 
-      options.pruneSessionInterval = undefined;
+      delete options.pruneSessionInterval;
       options.pruneSessionRandomizedInterval = sinon.stub().returns(ACTUAL_DELAY);
 
       // Mocks and setup
@@ -102,7 +107,7 @@ describe('PGStore', function () {
     });
 
     it('should run on exactly the default interval and close when no randomness', async () => {
-      options.pruneSessionInterval = undefined;
+      delete options.pruneSessionInterval;
       options.pruneSessionRandomizedInterval = false;
 
       // Mocks and setup
@@ -225,8 +230,11 @@ describe('PGStore', function () {
   });
 
   describe('configSetup', function () {
+    /** @type {import('sinon').SinonStub} */
     let poolStub;
+    /** @type {import('..').ExpressSessionStore} */
     let ProxiedPGStore;
+    /** @type {import('..').PGStoreOptions} */
     let baseOptions;
 
     beforeEach(function () {
@@ -285,8 +293,11 @@ describe('PGStore', function () {
   });
 
   describe('pgPromise', function () {
+    /** @type {import('sinon').SinonStub} */
     let poolStub;
+    /** @type {import('..').ExpressSessionStore} */
     let ProxiedPGStore;
+    /** @type {import('..').PGStoreOptions} */
     let baseOptions;
 
     beforeEach(function () {

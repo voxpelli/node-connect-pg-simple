@@ -10,21 +10,25 @@ const request = require('supertest');
 chai.use(chaiAsPromised);
 chai.should();
 
+const express = require('express');
+const session = require('express-session');
+const pgp = require('pg-promise')();
+
+const connectPgSimple = require('../..');
+const dbUtils = require('../db-utils');
+const conObject = dbUtils.conObject;
+const queryPromise = dbUtils.queryPromise;
+
+const pgPromise = pgp(conObject);
+
 describe('pgPromise', function () {
-  const express = require('express');
-  const session = require('express-session');
-  const pgp = require('pg-promise')();
-
-  const connectPgSimple = require('../../');
-  const dbUtils = require('../db-utils');
-  const conObject = dbUtils.conObject;
-  const queryPromise = dbUtils.queryPromise;
-
   const secret = 'abc123';
   const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
 
-  const pgPromise = pgp(conObject);
-
+  /**
+   * @param {import('../..').ExpressSessionStore} store
+   * @returns {import('express').Express}
+   */
   const appSetup = (store) => {
     const app = express();
 
@@ -99,14 +103,14 @@ describe('pgPromise', function () {
         .should.eventually.have.nested.property('rows[0].count', '2')
         .then(() => {
           clock.tick(maxAge * 0.6);
-          return new Promise((resolve, reject) => store.pruneSessions(err => err ? reject(err) : resolve()));
+          return new Promise((resolve, reject) => store.pruneSessions(/** @param {Error} err */ err => { err ? reject(err) : resolve(); }));
         })
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
         .should.eventually.have.nested.property('rows[0].count', '2')
         .then(() => agent.get('/').expect(200))
         .then(() => {
           clock.tick(maxAge * 0.6);
-          return new Promise((resolve, reject) => store.pruneSessions(err => err ? reject(err) : resolve()));
+          return new Promise((resolve, reject) => store.pruneSessions(/** @param {Error} err */ err => { err ? reject(err) : resolve(); }));
         })
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
         .should.eventually.have.nested.property('rows[0].count', '1');

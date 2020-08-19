@@ -20,29 +20,13 @@ const currentTimestamp = () => Math.ceil(Date.now() / 1000);
  */
 const escapePgIdentifier = (value) => value.replace(/"/g, '""');
 
-/** @typedef {(err?: Error|undefined) => void} SimpleErrorCallback */
-/**
- * @template T
- * @callback SimpleValueCallback
- * @param {Error|undefined} [err]
- * @param {T} [value]
- */
+/** @typedef {(err: Error|null) => void} SimpleErrorCallback */
 
-/**
- * @param {Error} err
- * @param {SimpleErrorCallback} [fn]
- * @throws {Error}
- */
-const errorToCallbackAndReject = (err, fn) => {
-  if (fn) fn(err);
-  throw err;
-};
-
-/** @typedef {*} SessionObject */
+/** @typedef {{ cookie: { maxAge: number, [property: string]: any }, [property: string]: any }} SessionObject */
 
 /** @typedef {(delay: number) => number} PGStorePruneDelayRandomizer */
 /** @typedef {Object<string, any>} PGStoreQueryResult */
-/** @typedef {(err?: Error, firstRow?: PGStoreQueryResult) => void} PGStoreQueryCallback */
+/** @typedef {(err: Error|null, firstRow?: PGStoreQueryResult) => void} PGStoreQueryCallback */
 
 /**
  * @typedef PGStoreOptions
@@ -69,13 +53,11 @@ module.exports = function (session) {
     session.session.Store;
 
   class PGStore extends Store {
-    /**
-     * @param {PGStoreOptions} options
-     */
+    /** @param {PGStoreOptions} options */
     constructor (options = {}) {
       super(options);
 
-      this.schemaName = options.schemaName ? escapePgIdentifier(options.schemaName) : null;
+      this.schemaName = options.schemaName ? escapePgIdentifier(options.schemaName) : undefined;
       /** @type {string} */
       this.tableName = options.tableName ? escapePgIdentifier(options.tableName) : 'session';
 
@@ -93,7 +75,7 @@ module.exports = function (session) {
         this.ownsPg = false;
       } else if (options.pgPromise !== undefined) {
         if (typeof options.pgPromise.query !== 'function') {
-          throw new Error('`pgPromise` config must point to an existing and configured instance of pg-promise pointing at your database');
+          throw new TypeError('`pgPromise` config must point to an existing and configured instance of pg-promise pointing at your database');
         }
         this.pgPromise = options.pgPromise;
         this.ownsPg = false;
@@ -140,7 +122,6 @@ module.exports = function (session) {
      *
      * @access public
      */
-
     close () {
       this.closed = true;
 
@@ -160,7 +141,6 @@ module.exports = function (session) {
      * @returns {number} the quoted schema + table for use in queries
      * @access private
      */
-
     getPruneDelay () {
       const delay = this.pruneSessionInterval;
 
@@ -173,10 +153,9 @@ module.exports = function (session) {
     /**
      * Does garbage collection for expired session in the database
      *
-     * @param {Function} [fn] - standard Node.js callback called on completion
+     * @param {SimpleErrorCallback} [fn] - standard Node.js callback called on completion
      * @access public
      */
-
     pruneSessions (fn) {
       this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < to_timestamp($1)', [currentTimestamp()], err => {
         if (fn && typeof fn === 'function') {
@@ -206,7 +185,6 @@ module.exports = function (session) {
      * @returns {string} the quoted schema + table for use in queries
      * @access private
      */
-
     quotedTable () {
       let result = '"' + this.tableName + '"';
 
@@ -224,7 +202,6 @@ module.exports = function (session) {
      * @returns {number} the unix timestamp, in seconds
      * @access private
      */
-
     getExpireTime (maxAge) {
       let ttl = this.ttl;
 
@@ -249,20 +226,23 @@ module.exports = function (session) {
         params = [];
       }
 
-        if (this.pgPromise) {
+      if (this.pgPromise) {
         this.pgPromise.query(query, params || [])
           .then(
             /** @param {PGStoreQueryResult} res */
+            // eslint-disable-next-line unicorn/no-null
             res => { fn && fn(null, res && res[0] ? res[0] : undefined); }
           )
           .catch(
             /** @param {Error} err */
             err => { fn && fn(err); }
           );
-        } else {
-        this.pool.query(query, params || [], function (err, res) {
-          if (fn) { fn(err, res && res.rows[0] ? res.rows[0] : undefined); }
-        });
+      } else {
+        this.pool.query(
+          query,
+          params || [],
+          (err, res) => { fn && fn(err, res && res.rows[0] ? res.rows[0] : undefined); }
+        );
       }
     }
 
@@ -270,17 +250,18 @@ module.exports = function (session) {
      * Attempt to fetch session by the given `sid`.
      *
      * @param {string} sid – the session id
-     * @param {Function} fn – a standard Node.js callback returning the parsed session object
+     * @param {(err: Error|null, firstRow?: PGStoreQueryResult) => void} fn – a standard Node.js callback returning the parsed session object
      * @access public
      */
-
     get (sid, fn) {
       this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= to_timestamp($2)', [sid, currentTimestamp()], (err, data) => {
         if (err) { return fn(err); }
-        if (!data) { return fn(); }
+        // eslint-disable-next-line unicorn/no-null
+        if (!data) { return fn(null); }
         try {
+          // eslint-disable-next-line unicorn/no-null
           return fn(null, (typeof data.sess === 'string') ? JSON.parse(data.sess) : data.sess);
-        } catch (e) {
+        } catch (err_) {
           return this.destroy(sid, fn);
         }
       });
@@ -290,49 +271,51 @@ module.exports = function (session) {
      * Commit the given `sess` object associated with the given `sid`.
      *
      * @param {string} sid – the session id
-     * @param {Object} sess – the session object to store
+     * @param {SessionObject} sess – the session object to store
      * @param {SimpleErrorCallback} fn – a standard Node.js callback returning the parsed session object
      * @access public
      */
-
     set (sid, sess, fn) {
       const expireTime = this.getExpireTime(sess.cookie.maxAge);
       const query = 'INSERT INTO ' + this.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 ON CONFLICT (sid) DO UPDATE SET sess=$1, expire=to_timestamp($2) RETURNING sid';
 
-      this.query(query, [sess, expireTime, sid], function (err) {
-        if (fn) { fn(err); }
-      });
+      this.query(
+        query,
+        [sess, expireTime, sid],
+        err => { fn && fn(err); }
+      );
     }
 
     /**
      * Destroy the session associated with the given `sid`.
      *
      * @param {string} sid – the session id
+     * @param {SimpleErrorCallback} fn – a standard Node.js callback returning the parsed session object
      * @access public
      */
-
     destroy (sid, fn) {
-      this.query('DELETE FROM ' + this.quotedTable() + ' WHERE sid = $1', [sid], function (err) {
-        if (fn) { fn(err); }
-      });
+      this.query(
+        'DELETE FROM ' + this.quotedTable() + ' WHERE sid = $1',
+        [sid],
+        err => { fn && fn(err); }
+      );
     }
 
     /**
      * Touch the given session object associated with the given session ID.
      *
      * @param {string} sid – the session id
-     * @param {Object} sess – the session object to store
-     * @param {Function} fn – a standard Node.js callback returning the parsed session object
+     * @param {SessionObject} sess – the session object to store
+     * @param {SimpleErrorCallback} fn – a standard Node.js callback returning the parsed session object
      * @access public
      */
-
     touch (sid, sess, fn) {
       const expireTime = this.getExpireTime(sess.cookie.maxAge);
 
       this.query(
         'UPDATE ' + this.quotedTable() + ' SET expire = to_timestamp($1) WHERE sid = $2 RETURNING sid',
         [expireTime, sid],
-        function (err) { fn(err); }
+        err => { fn && fn(err); }
       );
     }
   }
