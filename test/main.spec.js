@@ -12,6 +12,8 @@ const should = chai.should();
 
 const connectPgSimple = require('..');
 
+process.on('unhandledRejection', reason => { throw reason; });
+
 describe('PGStore', () => {
   const DEFAULT_DELAY = 60 * 15 * 1000;
 
@@ -292,6 +294,109 @@ describe('PGStore', () => {
     });
   });
 
+  describe('queries', () => {
+    /** @type {import('sinon').SinonStub} */
+    let poolStub;
+    /** @type {import('sinon').SinonStub} */
+    let queryStub;
+    /** @type {import('..').ExpressSessionStore} */
+    let store;
+
+    beforeEach(() => {
+      delete process.env.DATABASE_URL;
+
+      queryStub = sinon.stub();
+
+      poolStub = sinon.stub();
+      poolStub.prototype.on = () => {};
+      poolStub.prototype.query = queryStub;
+
+      const PGMock = { Pool: poolStub };
+      const proxiedConnectPgSimple = proxyquire('../', { pg: PGMock });
+
+      const ProxiedPGStore = proxiedConnectPgSimple({
+        Store: class FakeStore {}
+      });
+
+      const baseOptions = { pruneSessionInterval: false };
+
+      store = new ProxiedPGStore(Object.assign(baseOptions, {
+        conString: 'postgres://user:pass@localhost:1234/connect_pg_simple_test'
+      }));
+    });
+
+    it('should properly handle successfull callback queries', done => {
+      // eslint-disable-next-line unicorn/no-null
+      queryStub.callsArgWith(2, null, { rows: ['hej'] });
+
+      // @ts-ignore
+      store.query('SELECT * FROM faketable', [], (err, value) => {
+        // eslint-disable-next-line unicorn/no-null
+        should.equal(err, null);
+        should.equal(value, 'hej');
+        done();
+      });
+    });
+
+    it('should properly handle failing callback queries', done => {
+      const queryError = new Error('Fail');
+
+      queryStub.callsArgWith(2, queryError);
+
+      // @ts-ignore
+      store.query('SELECT * FROM faketable', [], (err, value) => {
+        should.equal(err, queryError);
+        should.not.exist(value);
+        done();
+      });
+    });
+
+    it('should properly handle param less query shorthand', done => {
+      // eslint-disable-next-line unicorn/no-null
+      queryStub.callsArgWith(2, null, { rows: ['hej'] });
+
+      // @ts-ignore
+      store.query('SELECT * FROM faketable', (err, value) => {
+        // eslint-disable-next-line unicorn/no-null
+        should.equal(err, null);
+        should.equal(value, 'hej');
+        done();
+      });
+    });
+
+    it('should throw on two callbacks set at once', () => {
+      // @ts-ignore
+      should.Throw(() => {
+        store.query('', () => {}, () => {});
+      });
+    });
+
+    it('should handle successfull destroy call', done => {
+      // eslint-disable-next-line unicorn/no-null
+      queryStub.callsArgWith(2, null, { rows: ['hej'] });
+
+      // @ts-ignore
+      store.destroy('foo', (err) => {
+        // eslint-disable-next-line unicorn/no-null
+        should.equal(err, null);
+        done();
+      });
+    });
+
+    it('should handle failing destroy call', done => {
+      const queryError = new Error('Fail');
+
+      queryStub.callsArgWith(2, queryError);
+
+      // @ts-ignore
+      store.destroy('foo', (err) => {
+        // eslint-disable-next-line unicorn/no-null
+        should.equal(err, queryError);
+        done();
+      });
+    });
+  });
+
   describe('pgPromise', () => {
     /** @type {import('sinon').SinonStub} */
     let poolStub;
@@ -348,6 +453,45 @@ describe('PGStore', () => {
       queryStub.should.have.been.calledOnce;
       queryStub.firstCall.args[0].should.equal('select');
       queryStub.firstCall.args[1].should.deep.equal([1, 2]);
+    });
+
+    it('should properly handle successfull callback queries', done => {
+      const queryStub = sinon.stub().resolves(['hej']);
+      const pgPromiseStub = {
+        query: queryStub
+      };
+
+      const store = new ProxiedPGStore(Object.assign(baseOptions, {
+        pgPromise: pgPromiseStub
+      }));
+
+      // @ts-ignore
+      store.query('SELECT * FROM faketable', [], (err, value) => {
+        // eslint-disable-next-line unicorn/no-null
+        should.equal(err, null);
+        should.equal(value, 'hej');
+        done();
+      });
+    });
+
+    it('should properly handle failing callback queries', done => {
+      const queryError = new Error('Fail');
+
+      const queryStub = sinon.stub().rejects(queryError);
+      const pgPromiseStub = {
+        query: queryStub
+      };
+
+      const store = new ProxiedPGStore(Object.assign(baseOptions, {
+        pgPromise: pgPromiseStub
+      }));
+
+      // @ts-ignore
+      store.query('SELECT * FROM faketable', [], (err, value) => {
+        should.equal(err, queryError);
+        should.not.exist(value);
+        done();
+      });
     });
   });
 });
