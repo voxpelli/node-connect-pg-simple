@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.2.1 (2020-08-19)
+
+* **Fix:** Regression, query errors wasn't properly forwarded. Fixes #180 and #179. Thanks @alxndrsn! (5c324ac)
+* **Test:** Added test for above regression (fd36978)
+* **Change:** Improved types + error return values (f73ea0d 68a2242)
+* **Change:** Updated SECURITY.md to delegate security reports to Tidelift, and thus ensure quicker responses (7683d40 59c7fbc)
+
 ## 6.2.0 (2020-08-06)
 
 * Important fix: Bump pg to 8.2.1 to support node 14+
