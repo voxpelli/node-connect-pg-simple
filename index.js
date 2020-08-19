@@ -240,32 +240,30 @@ module.exports = function (session) {
      * @param {string} query - the database query to perform
      * @param {any[]|PGStoreQueryCallback} [params] - the parameters of the query or the callback function
      * @param {PGStoreQueryCallback} [fn] - standard Node.js callback returning the resulting rows
-     * @returns {Promise<PGStoreQueryResult>}
      * @access private
      */
-    async query (query, params, fn) {
+    query (query, params, fn) {
       if (typeof params === 'function') {
-        fn = fn || params;
+        if (fn) throw new Error('Two callback functions set at once');
+        fn = params;
         params = [];
       }
 
-      let result;
-
-      try {
         if (this.pgPromise) {
-          const res = await this.pgPromise.query(query, params || []);
-          result = res && res[0] ? res[0] : false;
+        this.pgPromise.query(query, params || [])
+          .then(
+            /** @param {PGStoreQueryResult} res */
+            res => { fn && fn(null, res && res[0] ? res[0] : undefined); }
+          )
+          .catch(
+            /** @param {Error} err */
+            err => { fn && fn(err); }
+          );
         } else {
-          const res = await this.pool.query(query, params || []);
-          result = res && res.rows[0] ? res.rows[0] : false;
-        }
-      } catch (err) {
-        errorToCallbackAndReject(err);
+        this.pool.query(query, params || [], function (err, res) {
+          if (fn) { fn(err, res && res.rows[0] ? res.rows[0] : undefined); }
+        });
       }
-
-      if (fn) fn(undefined, result);
-
-      return result;
     }
 
     /**
