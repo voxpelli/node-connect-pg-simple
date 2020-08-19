@@ -12,7 +12,7 @@ const should = chai.should();
 
 const connectPgSimple = require('..');
 
-describe('PGStore', function () {
+describe('PGStore', () => {
   const DEFAULT_DELAY = 60 * 15 * 1000;
 
   /** @type {import('..').ExpressSessionStore} */
@@ -36,11 +36,11 @@ describe('PGStore', function () {
     sinon.restore();
   });
 
-  describe('pruneSessions', function () {
+  describe('pruneSessions', () => {
     /** @type {import('sinon').SinonFakeTimers} */
     let fakeClock;
 
-    beforeEach(function () {
+    beforeEach(() => {
       fakeClock = sinon.useFakeTimers();
     });
 
@@ -131,7 +131,7 @@ describe('PGStore', function () {
       mock.verify();
     });
 
-    it('should run on configurable interval', function () {
+    it('should run on configurable interval', () => {
       options.pruneSessionInterval = 1;
       options.pruneSessionRandomizedInterval = false;
 
@@ -144,21 +144,21 @@ describe('PGStore', function () {
       mock.expects('query').twice().yields();
 
       return Promise.resolve()
-        .then(function () {
+        .then(() => {
           fakeClock.tick(1);
         })
-        .then(function () {
+        .then(() => {
           store.pruneSessions.callCount.should.equal(1, 'Called from constructor');
           fakeClock.tick(1000);
         })
-        .then(function () {
+        .then(() => {
           store.pruneSessions.callCount.should.equal(2, 'Called by custom interval');
           store.close();
           mock.verify();
         });
     });
 
-    it('should not run when interval is disabled', function () {
+    it('should not run when interval is disabled', () => {
       const store = new PGStore(options);
 
       sinon.spy(store, 'pruneSessions');
@@ -168,68 +168,68 @@ describe('PGStore', function () {
       mock.expects('query').never().yields();
 
       return Promise.resolve()
-        .then(function () {
+        .then(() => {
           fakeClock.tick(1);
         })
-        .then(function () {
+        .then(() => {
           store.pruneSessions.called.should.equal(false, 'Not called from constructor');
           fakeClock.tick(60000);
         })
-        .then(function () {
+        .then(() => {
           store.pruneSessions.called.should.equal(false, 'Not called by interval');
           store.close();
           mock.verify();
         });
     });
 
-    afterEach(function () {
+    afterEach(() => {
       fakeClock.restore();
     });
   });
 
-  describe('quotedTable', function () {
-    it('should not include a schema by default', function () {
+  describe('quotedTable', () => {
+    it('should not include a schema by default', () => {
       (new PGStore(options)).quotedTable().should.be.a('string').that.equals('"session"');
     });
 
-    it('should have an overrideable table', function () {
+    it('should have an overrideable table', () => {
       options.tableName = 'foobar';
       (new PGStore(options)).quotedTable().should.be.a('string').that.equals('"foobar"');
     });
 
-    it('should have a definable schema', function () {
+    it('should have a definable schema', () => {
       options.schemaName = 'barfoo';
       (new PGStore(options)).quotedTable().should.be.a('string').that.equals('"barfoo"."session"');
     });
 
-    it('should accept custom schema and table', function () {
+    it('should accept custom schema and table', () => {
       options.tableName = 'foobar';
       options.schemaName = 'barfoo';
       (new PGStore(options)).quotedTable().should.be.a('string').that.equals('"barfoo"."foobar"');
     });
 
-    it('should accept legacy definition of schemas', function () {
+    it('should accept legacy definition of schemas', () => {
       options.tableName = 'barfoo"."foobar';
       (new PGStore(options)).quotedTable().should.be.a('string').that.equals('"barfoo"."foobar"');
     });
 
-    it('should not care about dots in names', function () {
+    it('should not care about dots in names', () => {
       options.tableName = 'barfoo.foobar';
       (new PGStore(options)).quotedTable().should.be.a('string').that.equals('"barfoo.foobar"');
     });
 
-    it('should escape table name', function () {
+    it('should escape table name', () => {
       options.tableName = 'foo"ba"r';
       (new PGStore(options)).quotedTable().should.be.a('string').that.equals('"foo""ba""r"');
     });
 
-    it('should escape schema name', function () {
+    it('should escape schema name', () => {
       options.schemaName = 'b""ar"foo';
       (new PGStore(options)).quotedTable().should.be.a('string').that.equals('"b""""ar""foo"."session"');
     });
   });
 
-  describe('configSetup', function () {
+  describe('configSetup', () => {
     /** @type {import('sinon').SinonStub} */
     let poolStub;
     /** @type {import('..').ExpressSessionStore} */
@@ -237,7 +237,7 @@ describe('PGStore', function () {
     /** @type {import('..').PGStoreOptions} */
     let baseOptions;
 
-    beforeEach(function () {
+    beforeEach(() => {
       delete process.env.DATABASE_URL;
 
       poolStub = sinon.stub();
@@ -253,8 +253,8 @@ describe('PGStore', function () {
       baseOptions = { pruneSessionInterval: false };
     });
 
-    it('should support basic conString', function () {
-      should.not.throw(function () {
+    it('should support basic conString', () => {
+      should.not.throw(() => {
         return new ProxiedPGStore(Object.assign(baseOptions, {
           conString: 'postgres://user:pass@localhost:1234/connect_pg_simple_test'
         }));
@@ -267,8 +267,8 @@ describe('PGStore', function () {
       });
     });
 
-    it('should support basic conObject', function () {
-      should.not.throw(function () {
+    it('should support basic conObject', () => {
+      should.not.throw(() => {
         return new ProxiedPGStore(Object.assign(baseOptions, {
           conObject: {
             user: 'user',
@@ -292,7 +292,7 @@ describe('PGStore', function () {
     });
   });
 
-  describe('pgPromise', function () {
+  describe('pgPromise', () => {
     /** @type {import('sinon').SinonStub} */
     let poolStub;
     /** @type {import('..').ExpressSessionStore} */
@@ -300,7 +300,7 @@ describe('PGStore', function () {
     /** @type {import('..').PGStoreOptions} */
     let baseOptions;
 
-    beforeEach(function () {
+    beforeEach(() => {
       delete process.env.DATABASE_URL;
 
       poolStub = sinon.stub();
@@ -315,25 +315,25 @@ describe('PGStore', function () {
       baseOptions = { pruneSessionInterval: false };
     });
 
-    it('should support pgPromise config', function () {
-      should.not.throw(function () {
+    it('should support pgPromise config', () => {
+      should.not.throw(() => {
         return new ProxiedPGStore(Object.assign(baseOptions, {
           pgPromise: {
-            query: function () {}
+            query: () => {}
           }
         }));
       });
     });
 
-    it('should throw on bad pgPromise', function () {
-      should.throw(function () {
+    it('should throw on bad pgPromise', () => {
+      should.throw(() => {
         return new ProxiedPGStore(Object.assign(baseOptions, {
           pgPromise: {}
         }));
       });
     });
 
-    it('should pass parameters to pgPromise', function () {
+    it('should pass parameters to pgPromise', () => {
       const queryStub = sinon.stub().resolves(true);
       const pgPromiseStub = {
         query: queryStub

@@ -21,7 +21,7 @@ const queryPromise = dbUtils.queryPromise;
 
 const pgPromise = pgp(conObject);
 
-describe('pgPromise', function () {
+describe('pgPromise', () => {
   const secret = 'abc123';
   const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
 
@@ -56,7 +56,7 @@ describe('pgPromise', function () {
     sinon.restore();
   });
 
-  describe('main', function () {
+  describe('main', () => {
     it('should generate a token', () => {
       const store = new (connectPgSimple(session))({ pgPromise });
       const app = appSetup(store);

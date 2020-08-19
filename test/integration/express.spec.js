@@ -20,7 +20,7 @@ const dbUtils = require('../db-utils');
 const conObject = dbUtils.conObject;
 const queryPromise = dbUtils.queryPromise;
 
-describe('Express', function () {
+describe('Express', () => {
   const secret = 'abc123';
   const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
 
@@ -55,7 +55,7 @@ describe('Express', function () {
     sinon.restore();
   });
 
-  describe('main', function () {
+  describe('main', () => {
     it('should generate a token', () => {
       const store = new (connectPgSimple(session))({ conObject });
       const app = appSetup(store);
