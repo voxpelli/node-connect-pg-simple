@@ -42,12 +42,17 @@ jobs:
         PGDATABASE: postgres
         PGPORT: ${{ job.services.postgres.ports[5432] }}
     - name: Coveralls Parallel
-      uses: coverallsapp/github-action@master
+      uses: coverallsapp/github-action@v1.1.2
       with:
         github-token: ${{ secrets.github_token }}
+        flag-name: run-${{ matrix.os }}-${{ matrix.node_version }}-${{ matrix.postgres_version }}
         parallel: true
+  coverage:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
     - name: Coveralls Finished
-      uses: coverallsapp/github-action@master
+      uses: coverallsapp/github-action@v1.1.2
       with:
         github-token: ${{ secrets.github_token }}
         parallel-finished: true
