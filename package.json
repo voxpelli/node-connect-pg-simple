@@ -56,17 +56,17 @@
     "cookiejar": "^2.1.2",
     "dependency-check": "^4.1.0",
     "dotenv": "^8.2.0",
-    "eslint": "^6.8.0",
+    "eslint": "^7.0.0",
     "eslint-config-standard": "^14.1.0",
     "eslint-plugin-es": "^3.0.0",
     "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-jsdoc": "^21.0.0",
-    "eslint-plugin-mocha": "^6.2.2",
+    "eslint-plugin-jsdoc": "^30.0.0",
+    "eslint-plugin-mocha": "^8.0.0",
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-security": "^1.4.0",
     "eslint-plugin-standard": "^4.0.0",
-    "eslint-plugin-unicorn": "^19.0.1",
+    "eslint-plugin-unicorn": "^21.0.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "husky": "^4.2.5",
@@ -79,6 +79,6 @@
     "sinon": "^9.0.0",
     "sinon-chai": "^3.5.0",
     "supertest": "^4.0.2",
-    "typescript": "^3.9.7"
+    "typescript": "^4.0.0"
   }
 }
