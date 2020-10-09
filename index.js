@@ -130,7 +130,7 @@ module.exports = function (session) {
         this.pruneTimer = undefined;
       }
 
-      if (this.ownsPg) {
+      if (this.ownsPg && this.pool) {
         this.pool.end();
       }
     }
@@ -238,6 +238,7 @@ module.exports = function (session) {
             err => { fn && fn(err); }
           );
       } else {
+        if (!this.pool) throw new Error('Pool missing for some reason');
         this.pool.query(
           query,
           params || [],
