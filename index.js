@@ -33,6 +33,7 @@ const escapePgIdentifier = (value) => value.replace(/"/g, '""');
  * @property {string} [schemaName]
  * @property {string} [tableName]
  * @property {number} [ttl]
+ * @property {boolean} [disableTouch]
  * @property {typeof console.error} [errorLog]
  * @property {Pool} [pool]
  * @property {*} [pgPromise]
@@ -67,6 +68,7 @@ module.exports = function (session) {
       }
 
       this.ttl = options.ttl;
+      this.disableTouch = !!options.disableTouch;
 
       this.errorLog = options.errorLog || console.error.bind(console);
 
@@ -316,6 +318,8 @@ module.exports = function (session) {
      * @access public
      */
     touch (sid, sess, fn) {
+      if (this.disableTouch) return;
+
       const expireTime = this._getExpireTime(sess);
 
       this.query(
