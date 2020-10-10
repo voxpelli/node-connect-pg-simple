@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.0.0 (YYYY-MM-DD)
+
+* **Larger change:** Align session expiration logic with [connect-redis](https://github.com/tj/connect-redis/blob/30efd159103ace270c844a5967428b43e7b8ba4a/migration-to-v4.md#changes-to-ttl-management) which in turned aligned with connect-mongo. Fixes #54
+
 ## 6.2.1 (2020-08-19)
 
 * **Fix:** Regression, query errors wasn't properly forwarded. Fixes #180 and #179. Thanks @alxndrsn! (5c324ac)

@@ -22,7 +22,7 @@ const escapePgIdentifier = (value) => value.replace(/"/g, '""');
 
 /** @typedef {(err: Error|null) => void} SimpleErrorCallback */
 
-/** @typedef {{ cookie: { maxAge: number, [property: string]: any }, [property: string]: any }} SessionObject */
+/** @typedef {{ cookie: { maxAge?: number, expire?: number, [property: string]: any }, [property: string]: any }} SessionObject */
 
 /** @typedef {(delay: number) => number} PGStorePruneDelayRandomizer */
 /** @typedef {Object<string, any>} PGStoreQueryResult */
@@ -198,17 +198,22 @@ module.exports = function (session) {
     /**
      * Figure out when a session should expire
      *
-     * @param {number} [maxAge] - the maximum age of the session cookie
+     * @param {SessionObject} sess – the session object to store
      * @returns {number} the unix timestamp, in seconds
      * @access private
      */
-    getExpireTime (maxAge) {
-      let ttl = this.ttl;
+    _getExpireTime (sess) {
+      let expire;
 
-      ttl = ttl || (typeof maxAge === 'number' ? maxAge / 1000 : ONE_DAY);
-      ttl = Math.ceil(ttl + currentTimestamp());
+      if (sess && sess.cookie && sess.cookie.expires) {
+        const expireDate = new Date(sess.cookie.expires);
+        expire = Math.ceil(expireDate.valueOf() / 1000);
+      } else {
+        const ttl = this.ttl || ONE_DAY;
+        expire = Math.ceil(Date.now() / 1000 + ttl);
+      }
 
-      return ttl;
+      return expire;
     }
 
     /**
@@ -277,7 +282,7 @@ module.exports = function (session) {
      * @access public
      */
     set (sid, sess, fn) {
-      const expireTime = this.getExpireTime(sess.cookie.maxAge);
+      const expireTime = this._getExpireTime(sess);
       const query = 'INSERT INTO ' + this.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 ON CONFLICT (sid) DO UPDATE SET sess=$1, expire=to_timestamp($2) RETURNING sid';
 
       this.query(
@@ -311,7 +316,7 @@ module.exports = function (session) {
      * @access public
      */
     touch (sid, sess, fn) {
-      const expireTime = this.getExpireTime(sess.cookie.maxAge);
+      const expireTime = this._getExpireTime(sess);
 
       this.query(
         'UPDATE ' + this.quotedTable() + ' SET expire = to_timestamp($1) WHERE sid = $2 RETURNING sid',
