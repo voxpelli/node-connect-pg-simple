@@ -81,7 +81,7 @@ module.exports = function (session) {
         this.pool = options.pool;
         this.ownsPg = false;
       } else if (options.pgPromise !== undefined) {
-        if (typeof options.pgPromise.query !== 'function') {
+        if (typeof options.pgPromise.any !== 'function') {
           throw new TypeError('`pgPromise` config must point to an existing and configured instance of pg-promise pointing at your database');
         }
         this.pgPromise = options.pgPromise;
@@ -303,7 +303,7 @@ module.exports = function (session) {
 
       if (this.pgPromise) {
         this._ensureSessionStoreTable(noTableCreation)
-          .then(() => this.pgPromise.query(query, resolvedParams))
+          .then(() => this.pgPromise.any(query, resolvedParams))
           .then(
             /** @param {PGStoreQueryResult} res */
             // eslint-disable-next-line unicorn/no-null

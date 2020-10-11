@@ -425,7 +425,7 @@ describe('PGStore', () => {
       should.not.throw(() => {
         return new ProxiedPGStore(Object.assign(baseOptions, {
           pgPromise: {
-            query: () => {}
+            any: () => {}
           }
         }));
       });
@@ -442,7 +442,7 @@ describe('PGStore', () => {
     it('should pass parameters to pgPromise', async () => {
       const queryStub = sinon.stub().resolves(true);
       const pgPromiseStub = {
-        query: queryStub
+        any: queryStub
       };
 
       const store = new ProxiedPGStore(Object.assign(baseOptions, {
@@ -459,7 +459,7 @@ describe('PGStore', () => {
     it('should properly handle successfull callback queries', done => {
       const queryStub = sinon.stub().resolves(['hej']);
       const pgPromiseStub = {
-        query: queryStub
+        any: queryStub
       };
 
       const store = new ProxiedPGStore(Object.assign(baseOptions, {
@@ -480,7 +480,7 @@ describe('PGStore', () => {
 
       const queryStub = sinon.stub().rejects(queryError);
       const pgPromiseStub = {
-        query: queryStub
+        any: queryStub
       };
 
       const store = new ProxiedPGStore(Object.assign(baseOptions, {
