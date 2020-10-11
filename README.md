@@ -101,7 +101,7 @@ Listed in the order they will be picked up. If multiple are defined, then the fi
 
 ## Useful methods
 
-* **close()** – if this module used its own database module to connect to Postgres, then this will shut that connection down to allow a graceful shutdown.
+* **close()** – if this module used its own database module to connect to Postgres, then this will shut that connection down to allow a graceful shutdown. Returns a `Promise` that will resolve when the database has shut down.
 * **pruneSessions([callback(err)])** – will prune old sessions. Only really needed to be called if **pruneSessionInterval** has been set to `false` – which can be useful if one wants improved control of the pruning.
 
 ## License

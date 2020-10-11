@@ -167,8 +167,9 @@ module.exports = function (session) {
      * Currently only stops the automatic pruning, if any, from continuing
      *
      * @access public
+     * @returns {Promise<void>}
      */
-    close () {
+    async close () {
       this.closed = true;
 
       if (this.pruneTimer) {
@@ -177,7 +178,7 @@ module.exports = function (session) {
       }
 
       if (this.ownsPg && this.pool) {
-        this.pool.end();
+        await this.pool.end();
       }
     }
 
