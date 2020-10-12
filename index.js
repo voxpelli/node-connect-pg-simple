@@ -400,7 +400,11 @@ module.exports = function (session) {
      * @access public
      */
     touch (sid, sess, fn) {
-      if (this.disableTouch) return;
+      if (this.disableTouch) {
+        // eslint-disable-next-line unicorn/no-null
+        fn && fn(null);
+        return;
+      }
 
       const expireTime = this._getExpireTime(sess);
 

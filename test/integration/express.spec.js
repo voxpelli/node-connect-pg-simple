@@ -23,20 +23,25 @@ const queryPromise = dbUtils.queryPromise;
 describe('Express', () => {
   const secret = 'abc123';
   const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+  /** @type {import('../..').ExpressSessionStore} */
+  let store;
 
   /**
    * @param {import('../..').ExpressSessionStore} store
+   * @param {Partial<import('express-session').SessionOptions>} [sessionOptions]
    * @returns {import('express').Express}
    */
-  const appSetup = (store) => {
+  const appSetup = (store, sessionOptions = {}) => {
     const app = express();
 
     app.use(session({
       store,
       secret,
       resave: false,
+      rolling: true,
       saveUninitialized: true,
-      cookie: { maxAge }
+      cookie: { maxAge },
+      ...sessionOptions
     }));
 
     app.get('/', (_req, res) => {
@@ -51,13 +56,15 @@ describe('Express', () => {
     await dbUtils.initTables();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    store && await store.close();
     sinon.restore();
   });
 
   describe('main', () => {
     it('should generate a token', () => {
-      const store = new (connectPgSimple(session))({ conObject });
+      store = new (connectPgSimple(session))({ conObject });
+
       const app = appSetup(store);
 
       return queryPromise('SELECT COUNT(sid) FROM session')
@@ -71,7 +78,8 @@ describe('Express', () => {
     });
 
     it('should return the token it generates', () => {
-      const store = new (connectPgSimple(session))({ conObject });
+      store = new (connectPgSimple(session))({ conObject });
+
       const app = appSetup(store);
 
       return request(app)
@@ -89,7 +97,8 @@ describe('Express', () => {
     });
 
     it('should reuse existing session when given a cookie', () => {
-      const store = new (connectPgSimple(session))({ conObject });
+      store = new (connectPgSimple(session))({ conObject });
+
       const app = appSetup(store);
       const agent = request.agent(app);
 
@@ -104,7 +113,8 @@ describe('Express', () => {
     });
 
     it('should not reuse existing session when not given a cookie', () => {
-      const store = new (connectPgSimple(session))({ conObject });
+      store = new (connectPgSimple(session))({ conObject });
+
       const app = appSetup(store);
 
       return queryPromise('SELECT COUNT(sid) FROM session')
@@ -117,8 +127,65 @@ describe('Express', () => {
         .should.eventually.have.nested.property('rows[0].count', '2');
     });
 
+    describe('touching', () => {
+      it('should update expiry dates on existing sessions when rolling is set', async () => {
+        const clock = sinon.useFakeTimers({ now: 1483228800000 });
+
+        store = new (connectPgSimple(session))({ conObject });
+
+        const app = appSetup(store);
+        const agent = request.agent(app);
+
+        (await queryPromise('SELECT expire FROM session')).should.have.nested.property('rows').that.is.empty;
+
+        await agent.get('/');
+
+        const firstResult = await queryPromise('SELECT extract(epoch from expire) AS expire FROM session');
+        firstResult.should.have.property('rows').that.has.length(1)
+          .with.nested.property('[0].expire').that.is.a('number');
+
+        await clock.tickAsync(10000);
+
+        await agent.get('/').expect(200);
+
+        const secondResult = await queryPromise('SELECT extract(epoch from expire) AS expire FROM session');
+        secondResult.should.have.property('rows').that.has.length(1)
+          .with.nested.property('[0].expire').that.is.a('number');
+
+        (secondResult.rows[0].expire - firstResult.rows[0].expire).should.equal(10);
+      });
+
+      it('should not update expiry dates on existing sessions when disableTouch is set', async () => {
+        const clock = sinon.useFakeTimers({ now: 1483228800000 });
+
+        store = new (connectPgSimple(session))({ conObject, disableTouch: true });
+
+        const app = appSetup(store);
+        const agent = request.agent(app);
+
+        (await queryPromise('SELECT expire FROM session')).should.have.nested.property('rows').that.is.empty;
+
+        await agent.get('/');
+
+        const firstResult = await queryPromise('SELECT extract(epoch from expire) AS expire FROM session');
+        firstResult.should.have.property('rows').that.has.length(1)
+          .with.nested.property('[0].expire').that.is.a('number');
+
+        await clock.tickAsync(10000);
+
+        await agent.get('/').expect(200);
+
+        const secondResult = await queryPromise('SELECT extract(epoch from expire) AS expire FROM session');
+        secondResult.should.have.property('rows').that.has.length(1)
+          .with.nested.property('[0].expire').that.is.a('number');
+
+        (secondResult.rows[0].expire - firstResult.rows[0].expire).should.equal(0);
+      });
+    });
+
     it('should invalidate a too old token', () => {
-      const store = new (connectPgSimple(session))({ conObject, pruneSessionInterval: false });
+      store = new (connectPgSimple(session))({ conObject, pruneSessionInterval: false });
+
       const app = appSetup(store);
       const agent = request.agent(app);
 
