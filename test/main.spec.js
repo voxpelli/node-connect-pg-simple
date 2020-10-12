@@ -327,8 +327,7 @@ describe('PGStore', () => {
     });
 
     it('should properly handle successfull callback queries', done => {
-      // eslint-disable-next-line unicorn/no-null
-      queryStub.callsArgWith(2, null, { rows: ['hej'] });
+      queryStub.resolves({ rows: ['hej'] });
 
       // @ts-ignore
       store.query('SELECT * FROM faketable', [], (err, value) => {
@@ -342,7 +341,7 @@ describe('PGStore', () => {
     it('should properly handle failing callback queries', done => {
       const queryError = new Error('Fail');
 
-      queryStub.callsArgWith(2, queryError);
+      queryStub.rejects(queryError);
 
       // @ts-ignore
       store.query('SELECT * FROM faketable', [], (err, value) => {
@@ -353,8 +352,7 @@ describe('PGStore', () => {
     });
 
     it('should properly handle param less query shorthand', done => {
-      // eslint-disable-next-line unicorn/no-null
-      queryStub.callsArgWith(2, null, { rows: ['hej'] });
+      queryStub.resolves({ rows: ['hej'] });
 
       // @ts-ignore
       store.query('SELECT * FROM faketable', (err, value) => {
@@ -374,7 +372,7 @@ describe('PGStore', () => {
 
     it('should handle successfull destroy call', done => {
       // eslint-disable-next-line unicorn/no-null
-      queryStub.callsArgWith(2, null, { rows: ['hej'] });
+      queryStub.resolves({ rows: ['hej'] });
 
       // @ts-ignore
       store.destroy('foo', (err) => {
@@ -387,7 +385,7 @@ describe('PGStore', () => {
     it('should handle failing destroy call', done => {
       const queryError = new Error('Fail');
 
-      queryStub.callsArgWith(2, queryError);
+      queryStub.rejects(queryError);
 
       // @ts-ignore
       store.destroy('foo', (err) => {

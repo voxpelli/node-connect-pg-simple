@@ -10,6 +10,30 @@ const ONE_DAY = 86400;
 /** @typedef {*} ExpressSessionStore */
 /** @typedef {import('pg').Pool} Pool */
 
+/**
+ * Inspired by util.callbackify()
+ *
+ * Never throws, even if callback is left out, as that's how it was
+ *
+ * @see {@link https://github.com/nodejs/node/blob/bcfb1762a3e613e71ac68ab8a6420e2f33c0f603/lib/util.js#L183-L213 util.callbackify() source code}
+ * @template T
+ * @param {Promise<T>} value
+ * @param {((err: Error|null, result: T) => void)|undefined} cb
+ * @returns {void}
+ */
+const callbackifyPromiseResolution = (value, cb) => {
+  if (!cb) {
+    value.catch(() => {});
+  } else {
+    // eslint-disable-next-line promise/catch-or-return
+    value.then(
+      // eslint-disable-next-line unicorn/no-null
+      (ret) => process.nextTick(cb, null, ret),
+      (err) => process.nextTick(cb, err || new Error('Promise was rejected with falsy value'))
+    );
+  }
+};
+
 /** @returns {number} */
 const currentTimestamp = () => Math.ceil(Date.now() / 1000);
 
@@ -273,11 +297,16 @@ module.exports = function (session) {
      * @access private
      */
     async _asyncQuery (query, params, noTableCreation) {
-      return new Promise((resolve, reject) => {
-        this.query(query, params, (err, result) => {
-          err ? reject(err) : resolve(result);
-        }, noTableCreation);
-      });
+      await this._ensureSessionStoreTable(noTableCreation);
+
+      if (this.pgPromise) {
+        const res = await this.pgPromise.any(query, params);
+        return res && res[0] ? res[0] : undefined;
+      } else {
+        if (!this.pool) throw new Error('Pool missing for some reason');
+        const res = await this.pool.query(query, params);
+        return res && res.rows && res.rows[0] ? res.rows[0] : undefined;
+      }
     }
 
     /**
@@ -302,35 +331,9 @@ module.exports = function (session) {
         resolvedParams = params || [];
       }
 
-      if (this.pgPromise) {
-        this._ensureSessionStoreTable(noTableCreation)
-          .then(() => this.pgPromise.any(query, resolvedParams))
-          .then(
-            /** @param {PGStoreQueryResult} res */
-            // eslint-disable-next-line unicorn/no-null
-            res => { fn && fn(null, res && res[0] ? res[0] : undefined); }
-          )
-          .catch(
-            /** @param {Error} err */
-            err => { fn && fn(err); }
-          );
-      } else {
-        this._ensureSessionStoreTable(noTableCreation)
-          .then(() => {
-            if (!this.pool) throw new Error('Pool missing for some reason');
-            this.pool.query(
-              query,
-              resolvedParams,
-              (err, res) => {
-                fn && fn(err, res && res.rows && res.rows[0] ? res.rows[0] : undefined);
-              }
-            );
-          })
-          .catch(
-            /** @param {Error} err */
-            err => { fn && fn(err); }
-          );
-      }
+      const result = this._asyncQuery(query, resolvedParams, noTableCreation);
+
+      callbackifyPromiseResolution(result, fn);
     }
 
     /**

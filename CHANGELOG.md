@@ -7,6 +7,7 @@
 * **Feature:** New option: `disableTouch`. Disables updating of TTL in database on touch. Fixes #55.
 * **Feature:** New option: `createTableIfMissing`. When set, the session table will be automatically created if missing. Fixes #158 and #173. Thanks @aadeshmisra!
 * **Tweak**: Slightly tweaked the pg-promise integration. Fixes #153.
+* **Tweak**: Introduced a new internal `_asyncQuery()` function in a move to modernize internal code on top of Promise / async / await.
 
 ## 6.2.1 (2020-08-19)
 
