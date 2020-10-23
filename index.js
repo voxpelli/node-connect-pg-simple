@@ -88,6 +88,7 @@ module.exports = function (session) {
       this.tableName = options.tableName ? escapePgIdentifier(options.tableName) : 'session';
 
       if (!this.schemaName && this.tableName.includes('"."')) {
+        // eslint-disable-next-line no-console
         console.warn('DEPRECATION WARNING: Schema should be provided through its dedicated "schemaName" option rather than through "tableName"');
         this.tableName = this.tableName.replace(/^([^"]+)""\.""([^"]+)$/, '$1"."$2');
       }
@@ -99,6 +100,7 @@ module.exports = function (session) {
       this.ttl = options.ttl;
       this.disableTouch = !!options.disableTouch;
 
+      // eslint-disable-next-line no-console
       this.errorLog = options.errorLog || console.error.bind(console);
 
       if (options.pool !== undefined) {
@@ -351,7 +353,7 @@ module.exports = function (session) {
         try {
           // eslint-disable-next-line unicorn/no-null
           return fn(null, (typeof data.sess === 'string') ? JSON.parse(data.sess) : data.sess);
-        } catch (err_) {
+        } catch {
           return this.destroy(sid, fn);
         }
       });
