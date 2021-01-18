@@ -40,7 +40,7 @@ describe('pgPromise', () => {
       cookie: { maxAge }
     }));
 
-    app.get('/', (req, res) => {
+    app.get('/', (_req, res) => {
       res.send('Hello World!');
     });
 

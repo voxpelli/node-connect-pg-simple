@@ -24,7 +24,7 @@ const callbackifyPromiseResolution = (value, cb) => {
   if (!cb) {
     value.catch(() => {});
   } else {
-    // eslint-disable-next-line promise/catch-or-return
+    // eslint-disable-next-line promise/catch-or-return, promise/prefer-await-to-then
     value.then(
       // eslint-disable-next-line unicorn/no-null
       (ret) => process.nextTick(cb, null, ret),

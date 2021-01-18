@@ -134,7 +134,7 @@ describe('PGStore', () => {
       mock.verify();
     });
 
-    it('should run on configurable interval', () => {
+    it('should run on configurable interval', async () => {
       options.pruneSessionInterval = 1;
       options.pruneSessionRandomizedInterval = false;
 
@@ -146,22 +146,15 @@ describe('PGStore', () => {
 
       mock.expects('query').twice().yields();
 
-      return Promise.resolve()
-        .then(() => {
-          fakeClock.tick(1);
-        })
-        .then(() => {
-          store.pruneSessions.callCount.should.equal(1, 'Called from constructor');
-          fakeClock.tick(1000);
-        })
-        .then(() => {
-          store.pruneSessions.callCount.should.equal(2, 'Called by custom interval');
-          store.close();
-          mock.verify();
-        });
+      await fakeClock.tickAsync(1);
+      store.pruneSessions.callCount.should.equal(1, 'Called from constructor');
+      await fakeClock.tickAsync(1000);
+      store.pruneSessions.callCount.should.equal(2, 'Called by custom interval');
+      store.close();
+      mock.verify();
     });
 
-    it('should not run when interval is disabled', () => {
+    it('should not run when interval is disabled', async () => {
       const store = new PGStore(options);
 
       sinon.spy(store, 'pruneSessions');
@@ -170,19 +163,12 @@ describe('PGStore', () => {
 
       mock.expects('query').never().yields();
 
-      return Promise.resolve()
-        .then(() => {
-          fakeClock.tick(1);
-        })
-        .then(() => {
-          store.pruneSessions.called.should.equal(false, 'Not called from constructor');
-          fakeClock.tick(60000);
-        })
-        .then(() => {
-          store.pruneSessions.called.should.equal(false, 'Not called by interval');
-          store.close();
-          mock.verify();
-        });
+      await fakeClock.tickAsync(1);
+      store.pruneSessions.called.should.equal(false, 'Not called from constructor');
+      await fakeClock.tickAsync(60000);
+      store.pruneSessions.called.should.equal(false, 'Not called by interval');
+      store.close();
+      mock.verify();
     });
 
     afterEach(() => {
