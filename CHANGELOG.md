@@ -1,9 +1,10 @@
 # Changelog
 
-## 7.0.0 (YYYY-MM-DD)
+## 7.0.0-0 (2021-01-18)
 
 * **Possibly breaking change:** Align session expiration logic with [connect-redis](https://github.com/tj/connect-redis/blob/30efd159103ace270c844a5967428b43e7b8ba4a/migration-to-v4.md#changes-to-ttl-management) which in turned aligned with connect-mongo. Fixes #54.
 * **Minor breaking change:** The `.close()` method is now async and returns a `Promise` that will be resolved when this session store is fully shut down. Fixes #183.
+* **Minor breaking change:** Now requires Node version `^10.17.0 || >=11.14.0`
 * **Feature:** New option: `disableTouch`. Disables updating of TTL in database on touch. Fixes #55.
 * **Feature:** New option: `createTableIfMissing`. When set, the session table will be automatically created if missing. Fixes #158 and #173. Thanks @aadeshmisra!
 * **Tweak**: Slightly tweaked the pg-promise integration. Fixes #153.
