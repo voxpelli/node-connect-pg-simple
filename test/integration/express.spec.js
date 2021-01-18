@@ -201,14 +201,16 @@ describe('Express', () => {
         .should.eventually.have.nested.property('rows[0].count', '2')
         .then(() => {
           clock.tick(maxAge * 0.6);
-          return new Promise((resolve, reject) => store.pruneSessions(/** @param {Error} err */ err => { err ? reject(err) : resolve(); }));
+          // eslint-disable-next-line unicorn/no-useless-undefined
+          return new Promise((resolve, reject) => store.pruneSessions(/** @param {Error} err */ err => { err ? reject(err) : resolve(undefined); }));
         })
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
         .should.eventually.have.nested.property('rows[0].count', '2')
         .then(() => agent.get('/').expect(200))
         .then(() => {
           clock.tick(maxAge * 0.6);
-          return new Promise((resolve, reject) => store.pruneSessions(/** @param {Error} err */ err => { err ? reject(err) : resolve(); }));
+          // eslint-disable-next-line unicorn/no-useless-undefined
+          return new Promise((resolve, reject) => store.pruneSessions(/** @param {Error} err */ err => { err ? reject(err) : resolve(undefined); }));
         })
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
         .should.eventually.have.nested.property('rows[0].count', '1');

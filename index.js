@@ -15,7 +15,6 @@ const ONE_DAY = 86400;
  *
  * Never throws, even if callback is left out, as that's how it was
  *
- * @see {@link https://github.com/nodejs/node/blob/bcfb1762a3e613e71ac68ab8a6420e2f33c0f603/lib/util.js#L183-L213 util.callbackify() source code}
  * @template T
  * @param {Promise<T>} value
  * @param {((err: Error|null, result: T) => void)|undefined} cb
