@@ -69,7 +69,7 @@
     "eslint-plugin-standard": "^4.1.0",
     "eslint-plugin-unicorn": "^24.0.0",
     "express": "^4.17.1",
-    "express-session": "^1.17.1",
+    "express-session": "^1.17.2",
     "husky": "^4.3.8",
     "installed-check": "^3.0.0",
     "mocha": "^8.4.0",
