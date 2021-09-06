@@ -7,12 +7,12 @@ const pathModule = require('path');
 
 const pg = require('pg');
 
-const dotEnvFile = process.env.DOTENV_FILE || pathModule.resolve(__dirname, './.env');
+const dotEnvFile = process.env['DOTENV_FILE'] || pathModule.resolve(__dirname, './.env');
 
 require('dotenv').config({ path: dotEnvFile });
 
 const conObject = {
-  database: process.env.PGDATABASE || 'connect_pg_simple_test'
+  database: process.env['PGDATABASE'] || 'connect_pg_simple_test'
 };
 
 const pool = new pg.Pool(conObject);

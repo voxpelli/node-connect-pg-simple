@@ -227,7 +227,7 @@ describe('PGStore', () => {
     let baseOptions;
 
     beforeEach(() => {
-      delete process.env.DATABASE_URL;
+      delete process.env['DATABASE_URL'];
 
       poolStub = sinon.stub();
       poolStub.prototype.on = () => {};
@@ -290,7 +290,7 @@ describe('PGStore', () => {
     let store;
 
     beforeEach(() => {
-      delete process.env.DATABASE_URL;
+      delete process.env['DATABASE_URL'];
 
       queryStub = sinon.stub();
 
@@ -391,7 +391,7 @@ describe('PGStore', () => {
     let baseOptions;
 
     beforeEach(() => {
-      delete process.env.DATABASE_URL;
+      delete process.env['DATABASE_URL'];
 
       poolStub = sinon.stub();
 

@@ -112,7 +112,7 @@ module.exports = function (session) {
         this.pgPromise = options.pgPromise;
         this.ownsPg = false;
       } else {
-        const conString = options.conString || process.env.DATABASE_URL;
+        const conString = options.conString || process.env['DATABASE_URL'];
         let conObject = options.conObject;
 
         if (!conObject) {
@@ -157,7 +157,7 @@ module.exports = function (session) {
 
       const res = await this._asyncQuery('SELECT to_regclass($1::text)', [quotedTable], true);
 
-      if (res && res.to_regclass === null) {
+      if (res && res['to_regclass'] === null) {
         const pathModule = require('path');
         const fs = require('fs').promises;
 
@@ -277,8 +277,8 @@ module.exports = function (session) {
     _getExpireTime (sess) {
       let expire;
 
-      if (sess && sess.cookie && sess.cookie.expires) {
-        const expireDate = new Date(sess.cookie.expires);
+      if (sess && sess.cookie && sess.cookie['expires']) {
+        const expireDate = new Date(sess.cookie['expires']);
         expire = Math.ceil(expireDate.valueOf() / 1000);
       } else {
         const ttl = this.ttl || ONE_DAY;
@@ -351,7 +351,7 @@ module.exports = function (session) {
         if (!data) { return fn(null); }
         try {
           // eslint-disable-next-line unicorn/no-null
-          return fn(null, (typeof data.sess === 'string') ? JSON.parse(data.sess) : data.sess);
+          return fn(null, (typeof data['sess'] === 'string') ? JSON.parse(data['sess']) : data['sess']);
         } catch {
           return this.destroy(sid, fn);
         }
