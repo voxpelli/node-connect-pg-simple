@@ -21,6 +21,10 @@
     "node": ">=12.0.0"
   },
   "main": "index.js",
+  "files": [
+    "index.js",
+    "table.sql"
+  ],
   "scripts": {
     "check:dependency-check": "dependency-check *.js 'test/**/*.js' --no-dev -i @types/pg",
     "check:installed-check": "installed-check -i eslint -i mocha -i @voxpelli/eslint-config -i @voxpelli/eslint-config-jsdoc-ts",
