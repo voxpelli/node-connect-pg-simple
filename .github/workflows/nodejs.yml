@@ -11,9 +11,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node_version: [10, 12, 14]
+        node_version: [10, 12, 14, 16]
         os: [ubuntu-latest]
-        postgres_version: [12, 11, 10, 9.6]
+        postgres_version: [13, 12, 11, 10, 9.6]
     services:
       postgres:
         image: postgres:${{ matrix.postgres_version }}
