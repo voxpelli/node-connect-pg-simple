@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.0.0 (2021-09-06)
+
+* **Breaking change:** Now requires at least Node.js 12.x
+* **Internal:** Updated some developer dependencies and test targets
+* As well as all changes in `7.0.0-0`
+
 ## 7.0.0-0 (2021-01-18)
 
 * **Possibly breaking change:** Align session expiration logic with [connect-redis](https://github.com/tj/connect-redis/blob/30efd159103ace270c844a5967428b43e7b8ba4a/migration-to-v4.md#changes-to-ttl-management) which in turned aligned with connect-mongo. Fixes #54.
