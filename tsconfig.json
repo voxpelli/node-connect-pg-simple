@@ -8,6 +8,6 @@
   ],
   "compilerOptions": {
     // TODO: Remove once either of https://github.com/microsoft/TypeScript/issues/45748 and https://github.com/DefinitelyTyped/DefinitelyTyped/pull/55425 has been fixes
-    "skipLibCheck": true
+    "exactOptionalPropertyTypes": false
   }
 }
