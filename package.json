@@ -49,7 +49,7 @@
     "@types/sinon": "^10.0.2",
     "@types/sinon-chai": "^3.2.5",
     "@types/supertest": "^2.0.11",
-    "@voxpelli/eslint-config": "^12.0.1",
+    "@voxpelli/eslint-config": "^12.0.2",
     "@voxpelli/eslint-config-jsdoc-ts": "^0.3.1",
     "@voxpelli/tsconfig": "^3.0.0-0",
     "chai": "^4.3.4",
