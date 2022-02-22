@@ -22,6 +22,7 @@ const ONE_DAY = 86400;
  */
 const callbackifyPromiseResolution = (value, cb) => {
   if (!cb) {
+    // eslint-disable-next-line promise/prefer-await-to-then
     value.catch(() => {});
   } else {
     // eslint-disable-next-line promise/catch-or-return, promise/prefer-await-to-then

@@ -2,6 +2,6 @@
   "extends": "@voxpelli",
   "root": true,
   "rules": {
-    "node/no-process-env": 0
+    "n/no-process-env": 0
   }
 }
