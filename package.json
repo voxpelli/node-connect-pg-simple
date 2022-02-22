@@ -67,7 +67,6 @@
     "eslint-plugin-n": "^14.0.0",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-security": "^1.4.0",
-    "eslint-plugin-standard": "^4.1.0",
     "eslint-plugin-unicorn": "^41.0.0",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
