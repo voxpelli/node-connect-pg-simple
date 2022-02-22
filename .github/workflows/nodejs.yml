@@ -1,8 +1,12 @@
 name: Node CI
 
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   test:
@@ -11,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node_version: [12, 14, 16]
+        node_version: [12, 14, 16, 17]
         os: [ubuntu-latest]
         postgres_version: [13, 12, 11, 10, 9.6]
     services:
@@ -61,7 +65,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node_version: [12]
+        node_version: [lts/*]
         os: [ubuntu-latest]
 
     steps:
@@ -71,9 +75,6 @@ jobs:
       with:
         node-version: ${{ matrix.node_version }}
 
-    - name: npm install
-      run: npm install
-    - name: build
-      run: npm run build --if-present
-    - name: check
-      run: npm run check
+    - run: npm install
+    - run: npm run build --if-present
+    - run: npm run check
