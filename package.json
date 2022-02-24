@@ -55,7 +55,7 @@
     "c8": "^7.11.3",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
-    "cookie-signature": "^1.1.0",
+    "cookie-signature": "^1.2.0",
     "cookiejar": "^2.1.2",
     "dependency-check": "^5.0.0-6",
     "dotenv": "^10.0.0",
