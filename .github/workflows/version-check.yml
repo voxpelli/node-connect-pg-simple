@@ -1,0 +1,12 @@
+on: push
+name: Ensure package version updated
+jobs:
+  checkVersion:
+    name: Check package version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check package version
+        uses: technote-space/package-version-check-action@v1
+        with:
+          BRANCH_PREFIX: main/
