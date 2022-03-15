@@ -2,6 +2,11 @@ CREATE TABLE "session" (
   "sid" varchar NOT NULL COLLATE "default",
   "sess" json NOT NULL,
   "expire" timestamp(6) NOT NULL
+  -- Make this a foreign key referencing your user table
+  -- Something like:
+  -- ALTER TABLE "session"
+  -- ADD FOREIGN KEY ("userId") REFERENCES users(id);
+  "userId" UUID 
 )
 WITH (OIDS=FALSE);
 
