@@ -296,16 +296,11 @@ module.exports = function (session) {
      * @returns {string | null} the id of the user, or null if not present
      * @access private
      */
-     _getUserId(sess) {
-      let userId;
-
-      if (sess && sess.user && sess.user['id']) {
-          userId = sess.user['id'];
-      } else {
-          userId = null;
-      }
+    _getUserId (sess) {
+      // @ts-ignore
+      const userId = sess && sess.user && sess.user['id'] ? sess.user['id'] : undefined;
       return userId;
-  }
+    }
 
     /**
      * Query the database.
@@ -393,7 +388,7 @@ module.exports = function (session) {
           this.quotedTable() +
           ' (sess, expire, sid, "userId") SELECT $1, to_timestamp($2), $3, $4 ON CONFLICT (sid) DO UPDATE SET sess=$1, expire=to_timestamp($2), "userId"=$4 RETURNING sid';
       this.query(query, [sess, expireTime, sid, userId], (err) => {
-          fn && fn(err)
+        fn && fn(err);
       });
     }
 
