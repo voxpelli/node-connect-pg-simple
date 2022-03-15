@@ -290,6 +290,19 @@ module.exports = function (session) {
     }
 
     /**
+     * Get the User's ID from the session
+     *
+     * @param {SessionObject} sess – the session object to store
+     * @returns {string | null} the id of the user, or null if not present
+     * @access private
+     */
+    _getUserId (sess) {
+      // @ts-ignore
+      const userId = sess && sess.user && sess.user['id'] ? sess.user['id'] : undefined;
+      return userId;
+    }
+
+    /**
      * Query the database.
      *
      * @param {string} query - the database query to perform
@@ -369,13 +382,14 @@ module.exports = function (session) {
      */
     set (sid, sess, fn) {
       const expireTime = this._getExpireTime(sess);
-      const query = 'INSERT INTO ' + this.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 ON CONFLICT (sid) DO UPDATE SET sess=$1, expire=to_timestamp($2) RETURNING sid';
-
-      this.query(
-        query,
-        [sess, expireTime, sid],
-        err => { fn && fn(err); }
-      );
+      const userId = this._getUserId(sess);
+      const query =
+          'INSERT INTO ' +
+          this.quotedTable() +
+          ' (sess, expire, sid, "userId") SELECT $1, to_timestamp($2), $3, $4 ON CONFLICT (sid) DO UPDATE SET sess=$1, expire=to_timestamp($2), "userId"=$4 RETURNING sid';
+      this.query(query, [sess, expireTime, sid, userId], (err) => {
+        fn && fn(err);
+      });
     }
 
     /**
@@ -409,10 +423,11 @@ module.exports = function (session) {
       }
 
       const expireTime = this._getExpireTime(sess);
+      const userId = this._getUserId(sess);
 
       this.query(
-        'UPDATE ' + this.quotedTable() + ' SET expire = to_timestamp($1) WHERE sid = $2 RETURNING sid',
-        [expireTime, sid],
+        'UPDATE ' + this.quotedTable() + ' SET expire = to_timestamp($1), "userId" = $3 WHERE sid = $2 RETURNING sid',
+        [expireTime, sid, userId],
         err => { fn && fn(err); }
       );
     }
