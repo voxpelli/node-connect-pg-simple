@@ -6,7 +6,7 @@ CREATE TABLE "session" (
   -- Something like:
   -- ALTER TABLE "session"
   -- ADD FOREIGN KEY ("userId") REFERENCES users(id);
-  "userId" UUID 
+  "userId" varchar 
 )
 WITH (OIDS=FALSE);
 
