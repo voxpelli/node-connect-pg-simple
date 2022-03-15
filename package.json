@@ -1,6 +1,6 @@
 {
   "name": "@outlinerisk/connect-pg-simple",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple, minimal PostgreSQL session store for Connect/Express, with user tracking!",
   "url": "http://github.com/voxpelli/node-connect-pg-simple",
   "repository": {
@@ -18,7 +18,7 @@
     "pg": "^8.7.1"
   },
   "engines": {
-    "node": "^14.17.0 || >=16.0.0"
+    "node": ">=12.0.0|| ^14.17.0 || >=16.0.0"
   },
   "main": "index.js",
   "files": [
