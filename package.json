@@ -1,16 +1,16 @@
 {
   "name": "@outlinerisk/connect-pg-simple",
   "version": "1.0.0",
-  "description": "A simple, minimal PostgreSQL session store for Connect/Express",
+  "description": "A simple, minimal PostgreSQL session store for Connect/Express, with user tracking!",
   "url": "http://github.com/voxpelli/node-connect-pg-simple",
   "repository": {
     "type": "git",
     "url": "git://github.com/voxpelli/node-connect-pg-simple.git"
   },
   "author": {
-    "name": "Pelle Wessman",
-    "email": "pelle@kodfabrik.se",
-    "url": "http://kodfabrik.se/"
+    "name": "Pelle Wessman and Pathpoint",
+    "email": "fte@pathpoint.com",
+    "url": "https://pathpoint.com"
   },
   "license": "MIT",
   "dependencies": {
