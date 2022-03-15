@@ -17,6 +17,9 @@
     "@types/pg": "^8.6.1",
     "pg": "^8.7.1"
   },
+  "engines": {
+    "node": ">=12.x || ^14.17.0 || >=16.0.0"
+  },
   "main": "index.js",
   "files": [
     "index.js",
@@ -24,7 +27,6 @@
   ],
   "scripts": {
     "check:dependency-check": "dependency-check *.js 'test/**/*.js' --no-dev -i @types/pg",
-    "check:installed-check": "installed-check -i eslint-plugin-jsdoc",
     "check:lint": "eslint .",
     "check:tsc": "tsc",
     "check": "run-p check:*",
