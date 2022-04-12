@@ -44,6 +44,12 @@ const currentTimestamp = () => Math.ceil(Date.now() / 1000);
  */
 const escapePgIdentifier = (value) => value.replace(/"/g, '""');
 
+/**
+ * @param {string} value
+ * @returns {string}
+ */
+const unescapePgIdentifier = (value) => value.replace(/""/g, '"');
+
 /** @typedef {(err: Error|null) => void} SimpleErrorCallback */
 
 /** @typedef {{ cookie: { maxAge?: number, expire?: number, [property: string]: any }, [property: string]: any }} SessionObject */
@@ -394,7 +400,7 @@ module.exports = function (session) {
         if (!data) { return fn(null); }
         try {
           // eslint-disable-next-line unicorn/no-null
-          return fn(null, (typeof data['sess'] === 'string') ? JSON.parse(data['sess']) : data['sess']);
+          return fn(null, (typeof data[unescapePgIdentifier(this.sessColumnName)] === 'string') ? JSON.parse(data[unescapePgIdentifier(this.sessColumnName)]) : data[unescapePgIdentifier(this.sessColumnName)]);
         } catch {
           return this.destroy(sid, fn);
         }
