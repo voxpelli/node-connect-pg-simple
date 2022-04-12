@@ -52,7 +52,7 @@ const unescapePgIdentifier = (value) => value.replace(/""/g, '"');
 
 /** @typedef {(err: Error|null) => void} SimpleErrorCallback */
 
-/** @typedef {{ cookie: { maxAge?: number, expire?: number, [property: string]: any }, [property: string]: any }} SessionObject */
+/** @typedef {{ cookie: { maxAge?: number, expires?: number, [property: string]: any }, [property: string]: any }} SessionObject */
 
 /** @typedef {(delay: number) => number} PGStorePruneDelayRandomizer */
 /** @typedef {Object<string, any>} PGStoreQueryResult */
@@ -394,7 +394,7 @@ module.exports = function (session) {
      * @access public
      */
     get (sid, fn) {
-      this.query('SELECT ' + this.sessColumn() + ' FROM ' + this.quotedTable() + ' WHERE ' + this.sidColumn() + ' = $1 AND expire >= to_timestamp($2)', [sid, currentTimestamp()], (err, data) => {
+      this.query('SELECT ' + this.sessColumn() + ' FROM ' + this.quotedTable() + ' WHERE ' + this.sidColumn() + ' = $1 AND ' + this.expireColumn() + ' >= to_timestamp($2)', [sid, currentTimestamp()], (err, data) => {
         if (err) { return fn(err); }
         // eslint-disable-next-line unicorn/no-null
         if (!data) { return fn(null); }
