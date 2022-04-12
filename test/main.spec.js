@@ -218,6 +218,27 @@ describe('PGStore', () => {
     });
   });
 
+  describe('sidColumn', () => {
+    it('should escape sid column name', () => {
+      options.sidColumnName = 'foo"ba"r';
+      (new PGStore(options)).sidColumn().should.be.a('string').that.equals('"foo""ba""r"');
+    });
+  });
+
+  describe('sessColumn', () => {
+    it('should escape sess column name', () => {
+      options.sessColumnName = 'foo"ba"r';
+      (new PGStore(options)).sessColumn().should.be.a('string').that.equals('"foo""ba""r"');
+    });
+  });
+
+  describe('expireColumn', () => {
+    it('should escape expire column name', () => {
+      options.expireColumnName = 'foo"ba"r';
+      (new PGStore(options)).expireColumn().should.be.a('string').that.equals('"foo""ba""r"');
+    });
+  });
+
   describe('configSetup', () => {
     /** @type {import('sinon').SinonStub} */
     let poolStub;

@@ -56,6 +56,9 @@ const escapePgIdentifier = (value) => value.replace(/"/g, '""');
  * @typedef PGStoreOptions
  * @property {string} [schemaName]
  * @property {string} [tableName]
+ * @property {string} [sidColumnName]
+ * @property {string} [sessColumnName]
+ * @property {string} [expireColumnName]
  * @property {boolean} [createTableIfMissing]
  * @property {number} [ttl]
  * @property {boolean} [disableTouch]
@@ -92,6 +95,15 @@ module.exports = function (session) {
         console.warn('DEPRECATION WARNING: Schema should be provided through its dedicated "schemaName" option rather than through "tableName"');
         this.tableName = this.tableName.replace(/^([^"]+)""\.""([^"]+)$/, '$1"."$2');
       }
+
+      /** @type {string} */
+      this.sidColumnName = options.sidColumnName ? escapePgIdentifier(options.sidColumnName) : 'sid';
+
+      /** @type {string} */
+      this.sessColumnName = options.sessColumnName ? escapePgIdentifier(options.sessColumnName) : 'sess';
+
+      /** @type {string} */
+      this.expireColumnName = options.expireColumnName ? escapePgIdentifier(options.expireColumnName) : 'expire';
 
       this.createTableIfMissing = !!options.createTableIfMissing;
       /** @type {Promise<void>|undefined} */
@@ -230,7 +242,7 @@ module.exports = function (session) {
      * @access public
      */
     pruneSessions (fn) {
-      this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < to_timestamp($1)', [currentTimestamp()], err => {
+      this.query('DELETE FROM ' + this.quotedTable() + ' WHERE ' + this.expireColumn() + ' < to_timestamp($1)', [currentTimestamp()], err => {
         if (fn && typeof fn === 'function') {
           return fn(err);
         }
@@ -266,6 +278,36 @@ module.exports = function (session) {
       }
 
       return result;
+    }
+
+    /**
+     * Get the quoted sid column.
+     *
+     * @returns {string} the quoted sid column for use in queries
+     * @access private
+     */
+    sidColumn () {
+      return '"' + this.sidColumnName + '"';
+    }
+
+    /**
+     * Get the quoted sess column.
+     *
+     * @returns {string} the quoted sess column for use in queries
+     * @access private
+     */
+    sessColumn () {
+      return '"' + this.sessColumnName + '"';
+    }
+
+    /**
+     * Get the quoted expire column.
+     *
+     * @returns {string} the quoted expire column for use in queries
+     * @access private
+     */
+    expireColumn () {
+      return '"' + this.expireColumnName + '"';
     }
 
     /**
@@ -346,7 +388,7 @@ module.exports = function (session) {
      * @access public
      */
     get (sid, fn) {
-      this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= to_timestamp($2)', [sid, currentTimestamp()], (err, data) => {
+      this.query('SELECT ' + this.sessColumn() + ' FROM ' + this.quotedTable() + ' WHERE ' + this.sidColumn() + ' = $1 AND expire >= to_timestamp($2)', [sid, currentTimestamp()], (err, data) => {
         if (err) { return fn(err); }
         // eslint-disable-next-line unicorn/no-null
         if (!data) { return fn(null); }
@@ -369,7 +411,9 @@ module.exports = function (session) {
      */
     set (sid, sess, fn) {
       const expireTime = this._getExpireTime(sess);
-      const query = 'INSERT INTO ' + this.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 ON CONFLICT (sid) DO UPDATE SET sess=$1, expire=to_timestamp($2) RETURNING sid';
+      const query = 'INSERT INTO ' + this.quotedTable() + ' (' + this.sessColumn() + ', ' + this.expireColumn() + ', ' + this.sidColumn() + ')' +
+                    ' SELECT $1, to_timestamp($2), $3 ON CONFLICT (' + this.sidColumn() + ')' +
+                    ' DO UPDATE SET ' + this.sessColumn() + '=$1, ' + this.expireColumn() + '=to_timestamp($2) RETURNING ' + this.sidColumn();
 
       this.query(
         query,
@@ -387,7 +431,7 @@ module.exports = function (session) {
      */
     destroy (sid, fn) {
       this.query(
-        'DELETE FROM ' + this.quotedTable() + ' WHERE sid = $1',
+        'DELETE FROM ' + this.quotedTable() + ' WHERE ' + this.sidColumn() + ' = $1',
         [sid],
         err => { fn && fn(err); }
       );
@@ -411,7 +455,7 @@ module.exports = function (session) {
       const expireTime = this._getExpireTime(sess);
 
       this.query(
-        'UPDATE ' + this.quotedTable() + ' SET expire = to_timestamp($1) WHERE sid = $2 RETURNING sid',
+        'UPDATE ' + this.quotedTable() + ' SET ' + this.expireColumn() + ' = to_timestamp($1) WHERE ' + this.sidColumn() + ' = $2 RETURNING ' + this.sidColumn(),
         [expireTime, sid],
         err => { fn && fn(err); }
       );
