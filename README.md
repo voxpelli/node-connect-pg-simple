@@ -94,7 +94,10 @@ Listed in the order they will be picked up. If multiple are defined, then the fi
 * **createTableIfMissing** - if set to `true` then creates the table in the case where the table does not already exist. Defaults to `false`.
 * **disableTouch** – boolean value that if set to `true` disables the updating of TTL in the database when using touch. Defaults to false.
 * **schemaName** - if your session table is in another Postgres schema than the default (it normally isn't), then you can specify that here.
-* **tableName** - if your session table is named something else than `session`, then you can specify that here.
+* **tableName** - if your session table is named something other than `session`, then you can specify that here.
+* **sidColumnName** - if your sid column is named something other than `sid`, then you can specify that here.
+* **sessColumnName** - if your sess column is named something other than `sess`, then you can specify that here.
+* **expireColumnName** - if your expire column is named something other than `expire`, then you can specify that here.
 * **pruneSessionInterval** - sets the delay in seconds at which expired sessions are pruned from the database. Default is `60` seconds. If set to `false` no automatic pruning will happen. By default every delay is randomized between 50% and 150% of set value, resulting in an average delay equal to the set value, but spread out to even the load on the database. Automatic pruning will happen `pruneSessionInterval` seconds after the last pruning (includes manual prunes).
 * **pruneSessionRandomizedInterval** – if set to `false`, then the exact value of `pruneSessionInterval` will be used in all delays. No randomization will happen. If multiple instances all start at once, disabling randomization can mean that multiple instances are all triggering pruning at once, causing unnecessary load on the database. Can also be set to a method, taking a numeric `delay` parameter and returning a modified one, thus allowing a custom delay algorithm if wanted.
 * **errorLog** – the method used to log errors in those cases where an error can't be returned to a callback. Defaults to `console.error()`, but can be useful to override if one eg. uses [Bunyan](https://github.com/trentm/node-bunyan) for logging.
