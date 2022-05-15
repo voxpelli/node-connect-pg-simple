@@ -8,7 +8,6 @@ const ONE_DAY = 86400;
 
 /** @typedef {*} ExpressSession */
 /** @typedef {*} ExpressSessionStore */
-/** @typedef {import('pg').Pool} Pool */
 
 /**
  * Inspired by util.callbackify()
@@ -60,7 +59,7 @@ const escapePgIdentifier = (value) => value.replace(/"/g, '""');
  * @property {number} [ttl]
  * @property {boolean} [disableTouch]
  * @property {typeof console.error} [errorLog]
- * @property {Pool} [pool]
+ * @property {import('pg').Pool} [pool]
  * @property {*} [pgPromise]
  * @property {string} [conString]
  * @property {*} [conObject]
@@ -79,39 +78,60 @@ module.exports = function (session) {
     session.session.Store;
 
   class PGStore extends Store {
+    /** @type {boolean} */
+    #createTableIfMissing;
+    /** @type {boolean} */
+    #disableTouch;
+    /** @type {typeof console.error} */
+    #errorLog;
+    /** @type {boolean} */
+    #ownsPg;
+    /** @type {*} */
+    #pgPromise;
+    /** @type {import('pg').Pool|undefined} */
+    #pool;
+    /** @type {false|number} */
+    #pruneSessionInterval;
+    /** @type {PGStorePruneDelayRandomizer|undefined} */
+    #pruneSessionRandomizedInterval;
+    /** @type {string|undefined} */
+    #schemaName;
+    /** @type {Promise<void>|undefined} */
+    #tableCreationPromise;
+    /** @type {string} */
+    #tableName;
+
     /** @param {PGStoreOptions} options */
     constructor (options = {}) {
       super(options);
 
-      this.schemaName = options.schemaName ? escapePgIdentifier(options.schemaName) : undefined;
-      /** @type {string} */
-      this.tableName = options.tableName ? escapePgIdentifier(options.tableName) : 'session';
+      this.#schemaName = options.schemaName ? escapePgIdentifier(options.schemaName) : undefined;
+      this.#tableName = options.tableName ? escapePgIdentifier(options.tableName) : 'session';
 
-      if (!this.schemaName && this.tableName.includes('"."')) {
+      if (!this.#schemaName && this.#tableName.includes('"."')) {
         // eslint-disable-next-line no-console
         console.warn('DEPRECATION WARNING: Schema should be provided through its dedicated "schemaName" option rather than through "tableName"');
-        this.tableName = this.tableName.replace(/^([^"]+)""\.""([^"]+)$/, '$1"."$2');
+        this.#tableName = this.#tableName.replace(/^([^"]+)""\.""([^"]+)$/, '$1"."$2');
       }
 
-      this.createTableIfMissing = !!options.createTableIfMissing;
-      /** @type {Promise<void>|undefined} */
-      this.tableCreationPromise = undefined;
+      this.#createTableIfMissing = !!options.createTableIfMissing;
+      this.#tableCreationPromise = undefined;
 
-      this.ttl = options.ttl;
-      this.disableTouch = !!options.disableTouch;
+      this.ttl = options.ttl; // TODO: Make this private as well, some bug in at least TS 4.6.4 stops that
+      this.#disableTouch = !!options.disableTouch;
 
       // eslint-disable-next-line no-console
-      this.errorLog = options.errorLog || console.error.bind(console);
+      this.#errorLog = options.errorLog || console.error.bind(console);
 
       if (options.pool !== undefined) {
-        this.pool = options.pool;
-        this.ownsPg = false;
+        this.#pool = options.pool;
+        this.#ownsPg = false;
       } else if (options.pgPromise !== undefined) {
         if (typeof options.pgPromise.any !== 'function') {
           throw new TypeError('`pgPromise` config must point to an existing and configured instance of pg-promise pointing at your database');
         }
-        this.pgPromise = options.pgPromise;
-        this.ownsPg = false;
+        this.#pgPromise = options.pgPromise;
+        this.#ownsPg = false;
       } else {
         const conString = options.conString || process.env['DATABASE_URL'];
         let conObject = options.conObject;
@@ -123,21 +143,19 @@ module.exports = function (session) {
             conObject.connectionString = conString;
           }
         }
-        this.pool = new (require('pg')).Pool(conObject);
-        this.pool.on('error', err => {
-          this.errorLog('PG Pool error:', err.message);
+        this.#pool = new (require('pg')).Pool(conObject);
+        this.#pool.on('error', err => {
+          this.#errorLog('PG Pool error:', err.message);
         });
-        this.ownsPg = true;
+        this.#ownsPg = true;
       }
 
       if (options.pruneSessionInterval === false) {
-        /** @type {false|number} */
-        this.pruneSessionInterval = false;
+        this.#pruneSessionInterval = false;
       } else {
-        /** @type {false|number} */
-        this.pruneSessionInterval = (options.pruneSessionInterval || DEFAULT_PRUNE_INTERVAL_IN_SECONDS) * 1000;
+        this.#pruneSessionInterval = (options.pruneSessionInterval || DEFAULT_PRUNE_INTERVAL_IN_SECONDS) * 1000;
         if (options.pruneSessionRandomizedInterval !== false) {
-          this.pruneSessionRandomizedInterval = (
+          this.#pruneSessionRandomizedInterval = (
             options.pruneSessionRandomizedInterval ||
             // Results in at least 50% of the specified interval and at most 150%. Makes it so that multiple instances doesn't all prune at the same time.
             (delay => Math.ceil(delay / 2 + delay * Math.random()))
@@ -178,13 +196,13 @@ module.exports = function (session) {
      * @returns {Promise<void>}
      */
     async _ensureSessionStoreTable (noTableCreation) {
-      if (noTableCreation || this.createTableIfMissing === false) return;
+      if (noTableCreation || this.#createTableIfMissing === false) return;
 
-      if (!this.tableCreationPromise) {
-        this.tableCreationPromise = this._rawEnsureSessionStoreTable();
+      if (!this.#tableCreationPromise) {
+        this.#tableCreationPromise = this._rawEnsureSessionStoreTable();
       }
 
-      return this.tableCreationPromise;
+      return this.#tableCreationPromise;
     }
 
     /**
@@ -203,8 +221,8 @@ module.exports = function (session) {
         this.pruneTimer = undefined;
       }
 
-      if (this.ownsPg && this.pool) {
-        await this.pool.end();
+      if (this.#ownsPg && this.#pool) {
+        await this.#pool.end();
       }
     }
 
@@ -215,10 +233,10 @@ module.exports = function (session) {
      * @access private
      */
     getPruneDelay () {
-      const delay = this.pruneSessionInterval;
+      const delay = this.#pruneSessionInterval;
 
       if (!delay) throw new Error('Can not calculate delay when pruning is inactivated');
-      if (this.pruneSessionRandomizedInterval) return this.pruneSessionRandomizedInterval(delay);
+      if (this.#pruneSessionRandomizedInterval) return this.#pruneSessionRandomizedInterval(delay);
 
       return delay;
     }
@@ -236,10 +254,10 @@ module.exports = function (session) {
         }
 
         if (err) {
-          this.errorLog('Failed to prune sessions:', err.message);
+          this.#errorLog('Failed to prune sessions:', err.message);
         }
 
-        if (this.pruneSessionInterval && !this.closed) {
+        if (this.#pruneSessionInterval && !this.closed) {
           if (this.pruneTimer) {
             clearTimeout(this.pruneTimer);
           }
@@ -259,10 +277,10 @@ module.exports = function (session) {
      * @access private
      */
     quotedTable () {
-      let result = '"' + this.tableName + '"';
+      let result = '"' + this.#tableName + '"';
 
-      if (this.schemaName) {
-        result = '"' + this.schemaName + '".' + result;
+      if (this.#schemaName) {
+        result = '"' + this.#schemaName + '".' + result;
       }
 
       return result;
@@ -301,12 +319,12 @@ module.exports = function (session) {
     async _asyncQuery (query, params, noTableCreation) {
       await this._ensureSessionStoreTable(noTableCreation);
 
-      if (this.pgPromise) {
-        const res = await this.pgPromise.any(query, params);
+      if (this.#pgPromise) {
+        const res = await this.#pgPromise.any(query, params);
         return res && res[0] ? res[0] : undefined;
       } else {
-        if (!this.pool) throw new Error('Pool missing for some reason');
-        const res = await this.pool.query(query, params);
+        if (!this.#pool) throw new Error('Pool missing for some reason');
+        const res = await this.#pool.query(query, params);
         return res && res.rows && res.rows[0] ? res.rows[0] : undefined;
       }
     }
@@ -402,7 +420,7 @@ module.exports = function (session) {
      * @access public
      */
     touch (sid, sess, fn) {
-      if (this.disableTouch) {
+      if (this.#disableTouch) {
         // eslint-disable-next-line unicorn/no-null
         fn && fn(null);
         return;
