@@ -232,7 +232,7 @@ module.exports = function (session) {
      * @returns {number} the quoted schema + table for use in queries
      * @access private
      */
-    getPruneDelay () {
+    #getPruneDelay () {
       const delay = this.#pruneSessionInterval;
 
       if (!delay) throw new Error('Can not calculate delay when pruning is inactivated');
@@ -245,6 +245,7 @@ module.exports = function (session) {
      * Does garbage collection for expired session in the database
      *
      * @param {SimpleErrorCallback} [fn] - standard Node.js callback called on completion
+     * @returns {void}
      * @access public
      */
     pruneSessions (fn) {
@@ -263,7 +264,7 @@ module.exports = function (session) {
           }
           this.pruneTimer = setTimeout(
             () => { this.pruneSessions(); },
-            this.getPruneDelay()
+            this.#getPruneDelay()
           );
           this.pruneTimer.unref();
         }
@@ -293,7 +294,7 @@ module.exports = function (session) {
      * @returns {number} the unix timestamp, in seconds
      * @access private
      */
-    _getExpireTime (sess) {
+    #getExpireTime (sess) {
       let expire;
 
       if (sess && sess.cookie && sess.cookie['expires']) {
@@ -386,7 +387,7 @@ module.exports = function (session) {
      * @access public
      */
     set (sid, sess, fn) {
-      const expireTime = this._getExpireTime(sess);
+      const expireTime = this.#getExpireTime(sess);
       const query = 'INSERT INTO ' + this.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 ON CONFLICT (sid) DO UPDATE SET sess=$1, expire=to_timestamp($2) RETURNING sid';
 
       this.query(
@@ -426,7 +427,7 @@ module.exports = function (session) {
         return;
       }
 
-      const expireTime = this._getExpireTime(sess);
+      const expireTime = this.#getExpireTime(sess);
 
       this.query(
         'UPDATE ' + this.quotedTable() + ' SET expire = to_timestamp($1) WHERE sid = $2 RETURNING sid',
