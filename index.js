@@ -159,8 +159,8 @@ module.exports = function (session) {
       const res = await this._asyncQuery('SELECT to_regclass($1::text)', [quotedTable], true);
 
       if (res && res['to_regclass'] === null) {
-        const pathModule = require('path');
-        const fs = require('fs').promises;
+        const pathModule = require('node:path');
+        const fs = require('node:fs').promises;
 
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         const tableDefString = await fs.readFile(pathModule.resolve(__dirname, './table.sql'), 'utf8');

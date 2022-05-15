@@ -2,8 +2,8 @@
 
 'use strict';
 
-const fs = require('fs').promises;
-const pathModule = require('path');
+const fs = require('node:fs').promises;
+const pathModule = require('node:path');
 
 const pg = require('pg');
 
