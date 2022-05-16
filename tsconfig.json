@@ -1,13 +1,9 @@
 {
-  "extends": "@voxpelli/tsconfig/node12.json",
+  "extends": "@voxpelli/tsconfig/node14.json",
   "files": [
     "index.js"
   ],
   "include": [
     "test/**/*.js"
-  ],
-  "compilerOptions": {
-    // TODO: Remove once either of https://github.com/microsoft/TypeScript/issues/45748 and https://github.com/DefinitelyTyped/DefinitelyTyped/pull/55425 has been fixes
-    "exactOptionalPropertyTypes": false
-  }
+  ]
 }
