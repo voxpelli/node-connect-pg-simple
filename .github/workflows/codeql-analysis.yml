@@ -1,30 +1,42 @@
-name: "Code scanning - action"
+name: "CodeQL"
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
   schedule:
-    - cron: '0 5 * * 5'
+    - cron: '38 19 * * 5'
+
+permissions:
+  contents: read
 
 jobs:
-  # Based on example in https://github.com/github/codeql-action
-  CodeQL-Build:
+  analyze:
+    name: Analyze
     runs-on: ubuntu-latest
 
     permissions:
+      actions: read
+      contents: read
       security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript' ]
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
 
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
+      uses: github/codeql-action/autobuild@v2
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      uses: github/codeql-action/analyze@v2
