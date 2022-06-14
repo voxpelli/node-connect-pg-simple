@@ -2,12 +2,9 @@
 
 A simple, minimal PostgreSQL session store for Express/Connect
 
-[![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat)](https://github.com/Flet/semistandard)
-[![Build Status](https://github.com/voxpelli/node-connect-pg-simple/workflows/Node%20CI/badge.svg)](https://github.com/voxpelli/node-connect-pg-simple/actions)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvoxpelli%2Fnode-connect-pg-simple.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvoxpelli%2Fnode-connect-pg-simple?ref=badge_shield)
+[![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg)](https://github.com/voxpelli/eslint-config)
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/voxpelli/node-connect-pg-simple.svg)](https://isitmaintained.com/project/voxpelli/node-connect-pg-simple "Average time to resolve an issue")
 [![Percentage of issues still open](https://isitmaintained.com/badge/open/voxpelli/node-connect-pg-simple.svg)](https://isitmaintained.com/project/voxpelli/node-connect-pg-simple "Percentage of issues still open")
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/voxpelli/node-connect-pg-simple.svg?style=flat)](https://lgtm.com/projects/g/voxpelli/node-connect-pg-simple/context:javascript)
 
 
 ## Installation
@@ -101,10 +98,6 @@ Listed in the order they will be picked up. If multiple are defined, then the fi
 
 * **close()** – if this module used its own database module to connect to Postgres, then this will shut that connection down to allow a graceful shutdown. Returns a `Promise` that will resolve when the database has shut down.
 * **pruneSessions([callback(err)])** – will prune old sessions. Only really needed to be called if **pruneSessionInterval** has been set to `false` – which can be useful if one wants improved control of the pruning.
-
-## License
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvoxpelli%2Fnode-connect-pg-simple.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvoxpelli%2Fnode-connect-pg-simple?ref=badge_large)
 
 ## For enterprise
 
