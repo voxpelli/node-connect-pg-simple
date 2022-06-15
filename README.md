@@ -80,8 +80,8 @@ Listed in the order they will be picked up. If multiple are defined, then the fi
 
 * **pool** - _The recommended one_ – Connection pool object (compatible with [pg.Pool](https://github.com/brianc/node-pg-pool)) for the underlying database module.
 * **pgPromise** - Database object from `pg-promise` to be used for DB communications.
-* **conObject** - If you don't specify a pool object, use this option or `conString` to specify a PostgreSQL Pool connection [object](https://github.com/brianc/node-postgres#pooling-example) and this module will create a new pool for you.
-* **conString** - If you don't specify a pool object, use this option or `conObject` to specify a PostgreSQL connection [string](https://github.com/brianc/node-postgres/wiki/Client#new-clientstring-url-client) and this module will create a new pool for you. If the connection string is in the `DATABASE_URL` environment variable (as you do by default on eg. Heroku) – then this module fallback to that if this option is not specified.
+* **conObject** - If you don't specify a pool object, use this option or `conString` to specify a [PostgreSQL Pool connection object](https://node-postgres.com/api/client#constructor) and this module will create a new pool for you.
+* **conString** - If you don't specify a pool object, use this option or `conObject` to specify a PostgreSQL connection string like `postgres://user:password@host:5432/database` and this module will create a new pool for you. If there's a connection string in the `DATABASE_URL` environment variable (as it is by default on eg. Heroku) then this module will fallback to that if no other connection method has been specified.
 
 ### Other options
 
