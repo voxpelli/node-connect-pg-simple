@@ -357,7 +357,6 @@ describe('PGStore', () => {
     });
 
     it('should handle successfull destroy call', done => {
-      // eslint-disable-next-line unicorn/no-null
       queryStub.resolves({ rows: ['hej'] });
 
       // @ts-ignore
@@ -375,7 +374,6 @@ describe('PGStore', () => {
 
       // @ts-ignore
       store.destroy('foo', (err) => {
-        // eslint-disable-next-line unicorn/no-null
         should.equal(err, queryError);
         done();
       });
