@@ -2,10 +2,11 @@
 
 A simple, minimal PostgreSQL session store for Express/Connect
 
+[![npm version](https://img.shields.io/npm/v/connect-pg-simple.svg?style=flat)](https://www.npmjs.com/package/connect-pg-simple)
+[![npm downloads](https://img.shields.io/npm/dm/connect-pg-simple.svg?style=flat)](https://www.npmjs.com/package/connect-pg-simple)
+[![Module type: CJS](https://img.shields.io/badge/module%20type-cjs-brightgreen)](https://github.com/voxpelli/badges-cjs-esm)
 [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg)](https://github.com/voxpelli/eslint-config)
-[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/voxpelli/node-connect-pg-simple.svg)](https://isitmaintained.com/project/voxpelli/node-connect-pg-simple "Average time to resolve an issue")
-[![Percentage of issues still open](https://isitmaintained.com/badge/open/voxpelli/node-connect-pg-simple.svg)](https://isitmaintained.com/project/voxpelli/node-connect-pg-simple "Percentage of issues still open")
-
+[![Follow @voxpelli](https://img.shields.io/twitter/follow/voxpelli?style=social)](https://twitter.com/voxpelli)
 
 ## Installation
 
