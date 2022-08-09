@@ -40,7 +40,7 @@
     "test": "run-s check test:*"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.1",
+    "@types/chai": "^4.3.3",
     "@types/chai-as-promised": "^7.1.5",
     "@types/cookie-signature": "^1.0.4",
     "@types/express": "^4.17.13",
