@@ -17,6 +17,6 @@ jobs:
   test:
     uses: voxpelli/ghatemplates/.github/workflows/test-pg.yml@main
     with:
-      node-versions: '14,16,18'
+      node-versions: '14,16,18,19'
       os: 'ubuntu-latest'
       pg-versions: '9.6,12,13'
