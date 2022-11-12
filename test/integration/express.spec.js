@@ -143,7 +143,7 @@ describe('Express', () => {
 
         const firstResult = await queryPromise('SELECT extract(epoch from expire) AS expire FROM session');
         firstResult.should.have.property('rows').that.has.length(1)
-          .with.nested.property('[0].expire').that.is.a('number');
+          .with.nested.property('[0].expire').that.matches(/\d+/);
 
         await clock.tickAsync(10000);
 
@@ -151,7 +151,7 @@ describe('Express', () => {
 
         const secondResult = await queryPromise('SELECT extract(epoch from expire) AS expire FROM session');
         secondResult.should.have.property('rows').that.has.length(1)
-          .with.nested.property('[0].expire').that.is.a('number');
+          .with.nested.property('[0].expire').that.matches(/\d+/);
 
         (secondResult.rows[0].expire - firstResult.rows[0].expire).should.equal(10);
       });
@@ -170,7 +170,7 @@ describe('Express', () => {
 
         const firstResult = await queryPromise('SELECT extract(epoch from expire) AS expire FROM session');
         firstResult.should.have.property('rows').that.has.length(1)
-          .with.nested.property('[0].expire').that.is.a('number');
+          .with.nested.property('[0].expire').that.matches(/\d+/);
 
         await clock.tickAsync(10000);
 
@@ -178,7 +178,7 @@ describe('Express', () => {
 
         const secondResult = await queryPromise('SELECT extract(epoch from expire) AS expire FROM session');
         secondResult.should.have.property('rows').that.has.length(1)
-          .with.nested.property('[0].expire').that.is.a('number');
+          .with.nested.property('[0].expire').that.matches(/\d+/);
 
         (secondResult.rows[0].expire - firstResult.rows[0].expire).should.equal(0);
       });
