@@ -96,8 +96,10 @@ module.exports = function (session) {
     #pruneSessionRandomizedInterval;
     /** @type {string|undefined} */
     #schemaName;
-    /** @type {Promise<void>|undefined} */
+    /** @type {Promise<boolean>|undefined} */
     #tableCreationPromise;
+    /** @type {boolean|undefined} */
+    #tableExistenceEnsured;
     /** @type {string} */
     #tableName;
 
@@ -116,6 +118,7 @@ module.exports = function (session) {
 
       this.#createTableIfMissing = !!options.createTableIfMissing;
       this.#tableCreationPromise = undefined;
+      this.#tableExistenceEnsured = false;
 
       this.ttl = options.ttl; // TODO: Make this private as well, some bug in at least TS 4.6.4 stops that
       this.#disableTouch = !!options.disableTouch;
@@ -169,22 +172,28 @@ module.exports = function (session) {
      * Ensures the session store table exists, creating it if its missing
      *
      * @access private
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>}
      */
     async _rawEnsureSessionStoreTable () {
       const quotedTable = this.quotedTable();
 
-      const res = await this._asyncQuery('SELECT to_regclass($1::text)', [quotedTable], true);
+      try {
+        const res = await this._asyncQuery('SELECT to_regclass($1::text)', [quotedTable], true);
 
-      if (res && res['to_regclass'] === null) {
-        const pathModule = require('node:path');
-        const fs = require('node:fs').promises;
+        if (res && res['to_regclass'] === null) {
+          const pathModule = require('node:path');
+          const fs = require('node:fs').promises;
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        const tableDefString = await fs.readFile(pathModule.resolve(__dirname, './table.sql'), 'utf8');
-        const tableDefModified = tableDefString.replace(/"session"/g, quotedTable);
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          const tableDefString = await fs.readFile(pathModule.resolve(__dirname, './table.sql'), 'utf8');
+          const tableDefModified = tableDefString.replace(/"session"/g, quotedTable);
 
-        await this._asyncQuery(tableDefModified, [], true);
+          await this._asyncQuery(tableDefModified, [], true);
+        }
+
+        return true;
+      } catch {
+        return false;
       }
     }
 
@@ -193,16 +202,18 @@ module.exports = function (session) {
      *
      * @access private
      * @param {boolean|undefined} noTableCreation
-     * @returns {Promise<void>}
      */
     async _ensureSessionStoreTable (noTableCreation) {
-      if (noTableCreation || this.#createTableIfMissing === false) return;
+      if (noTableCreation || this.#createTableIfMissing === false || this.#tableExistenceEnsured) return;
 
       if (!this.#tableCreationPromise) {
         this.#tableCreationPromise = this._rawEnsureSessionStoreTable();
       }
+      this.#tableExistenceEnsured = await this.#tableCreationPromise;
 
-      return this.#tableCreationPromise;
+      if (!this.#tableExistenceEnsured) {
+        this.#tableCreationPromise = undefined;
+      }
     }
 
     /**
