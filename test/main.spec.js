@@ -25,13 +25,13 @@ describe('PGStore', () => {
 
   beforeEach(() => {
     PGStore = connectPgSimple({
-      Store: class FakeStore {}
+      Store: class FakeStore {},
     });
 
     options = {
       // @ts-ignore
       pool: {},
-      pruneSessionInterval: false
+      pruneSessionInterval: false,
     };
   });
 
@@ -236,7 +236,7 @@ describe('PGStore', () => {
       const proxiedConnectPgSimple = proxyquire('../', { pg: PGMock });
 
       ProxiedPGStore = proxiedConnectPgSimple({
-        Store: class FakeStore {}
+        Store: class FakeStore {},
       });
 
       baseOptions = { pruneSessionInterval: false };
@@ -245,14 +245,14 @@ describe('PGStore', () => {
     it('should support basic conString', () => {
       should.not.throw(() => {
         return new ProxiedPGStore(Object.assign(baseOptions, {
-          conString: 'postgres://user:pass@localhost:1234/connect_pg_simple_test'
+          conString: 'postgres://user:pass@localhost:1234/connect_pg_simple_test',
         }));
       });
 
       poolStub.should.have.been.calledOnce;
       poolStub.firstCall.args.should.have.lengthOf(1);
       poolStub.firstCall.args[0].should.deep.equal({
-        connectionString: 'postgres://user:pass@localhost:1234/connect_pg_simple_test'
+        connectionString: 'postgres://user:pass@localhost:1234/connect_pg_simple_test',
       });
     });
 
@@ -264,8 +264,8 @@ describe('PGStore', () => {
             password: 'pass',
             host: 'localhost',
             port: 1234,
-            database: 'connect_pg_simple_test'
-          }
+            database: 'connect_pg_simple_test',
+          },
         }));
       });
 
@@ -276,7 +276,7 @@ describe('PGStore', () => {
         password: 'pass',
         host: 'localhost',
         port: 1234,
-        database: 'connect_pg_simple_test'
+        database: 'connect_pg_simple_test',
       });
     });
   });
@@ -302,13 +302,13 @@ describe('PGStore', () => {
       const proxiedConnectPgSimple = proxyquire('../', { pg: PGMock });
 
       const ProxiedPGStore = proxiedConnectPgSimple({
-        Store: class FakeStore {}
+        Store: class FakeStore {},
       });
 
       const baseOptions = { pruneSessionInterval: false };
 
       store = new ProxiedPGStore(Object.assign(baseOptions, {
-        conString: 'postgres://user:pass@localhost:1234/connect_pg_simple_test'
+        conString: 'postgres://user:pass@localhost:1234/connect_pg_simple_test',
       }));
     });
 
@@ -397,7 +397,7 @@ describe('PGStore', () => {
       const proxiedConnectPgSimple = proxyquire('../', { pg: PGMock });
 
       ProxiedPGStore = proxiedConnectPgSimple({
-        Store: class FakeStore {}
+        Store: class FakeStore {},
       });
 
       baseOptions = { pruneSessionInterval: false };
@@ -407,8 +407,8 @@ describe('PGStore', () => {
       should.not.throw(() => {
         return new ProxiedPGStore(Object.assign(baseOptions, {
           pgPromise: {
-            any: () => {}
-          }
+            any: () => {},
+          },
         }));
       });
     });
@@ -416,7 +416,7 @@ describe('PGStore', () => {
     it('should throw on bad pgPromise', () => {
       should.throw(() => {
         return new ProxiedPGStore(Object.assign(baseOptions, {
-          pgPromise: {}
+          pgPromise: {},
         }));
       });
     });
@@ -424,11 +424,11 @@ describe('PGStore', () => {
     it('should pass parameters to pgPromise', async () => {
       const queryStub = sinon.stub().resolves(true);
       const pgPromiseStub = {
-        any: queryStub
+        any: queryStub,
       };
 
       const store = new ProxiedPGStore(Object.assign(baseOptions, {
-        pgPromise: pgPromiseStub
+        pgPromise: pgPromiseStub,
       }));
 
       await store._asyncQuery('select', [1, 2]);
@@ -441,11 +441,11 @@ describe('PGStore', () => {
     it('should properly handle successfull callback queries', done => {
       const queryStub = sinon.stub().resolves(['hej']);
       const pgPromiseStub = {
-        any: queryStub
+        any: queryStub,
       };
 
       const store = new ProxiedPGStore(Object.assign(baseOptions, {
-        pgPromise: pgPromiseStub
+        pgPromise: pgPromiseStub,
       }));
 
       // @ts-ignore
@@ -462,11 +462,11 @@ describe('PGStore', () => {
 
       const queryStub = sinon.stub().rejects(queryError);
       const pgPromiseStub = {
-        any: queryStub
+        any: queryStub,
       };
 
       const store = new ProxiedPGStore(Object.assign(baseOptions, {
-        pgPromise: pgPromiseStub
+        pgPromise: pgPromiseStub,
       }));
 
       // @ts-ignore

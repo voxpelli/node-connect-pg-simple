@@ -41,7 +41,7 @@ const currentTimestamp = () => Math.ceil(Date.now() / 1000);
  * @param {string} value
  * @returns {string}
  */
-const escapePgIdentifier = (value) => value.replace(/"/g, '""');
+const escapePgIdentifier = (value) => value.replaceAll('"', '""');
 
 /** @typedef {(err: Error|null) => void} SimpleErrorCallback */
 
@@ -180,9 +180,8 @@ module.exports = function (session) {
         const pathModule = require('node:path');
         const fs = require('node:fs').promises;
 
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         const tableDefString = await fs.readFile(pathModule.resolve(__dirname, './table.sql'), 'utf8');
-        const tableDefModified = tableDefString.replace(/"session"/g, quotedTable);
+        const tableDefModified = tableDefString.replaceAll('"session"', quotedTable);
 
         await this._asyncQuery(tableDefModified, [], true);
       }

@@ -42,7 +42,7 @@ describe('Express', () => {
       rolling: true,
       saveUninitialized: true,
       cookie: { maxAge },
-      ...sessionOptions
+      ...sessionOptions,
     }));
 
     app.get('/', (_req, res) => {
@@ -196,7 +196,7 @@ describe('Express', () => {
         .should.eventually.have.nested.property('rows[0].count', '0')
         .then(() => Promise.all([
           request(app).get('/'),
-          agent.get('/')
+          agent.get('/'),
         ]))
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
         .should.eventually.have.nested.property('rows[0].count', '2')

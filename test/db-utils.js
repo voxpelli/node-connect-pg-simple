@@ -12,7 +12,7 @@ const dotEnvFile = process.env['DOTENV_FILE'] || pathModule.resolve(__dirname, '
 require('dotenv').config({ path: dotEnvFile });
 
 const conObject = {
-  database: process.env['PGDATABASE'] || 'connect_pg_simple_test'
+  database: process.env['PGDATABASE'] || 'connect_pg_simple_test',
 };
 
 const pool = new pg.Pool(conObject);
@@ -26,7 +26,6 @@ const removeTables = async () => {
 
 /** @returns {Promise<void>} */
 const initTables = async () => {
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
   const tableDef = await fs.readFile(pathModule.resolve(__dirname, '../table.sql'), 'utf8');
   await pool.query(tableDef);
 };
@@ -35,5 +34,5 @@ module.exports = Object.freeze({
   conObject,
   queryPromise: pool.query.bind(pool),
   removeTables,
-  initTables
+  initTables,
 });

@@ -17,7 +17,7 @@ const connectPgSimple = require('../..');
 const {
   initTables,
   queryPromise,
-  removeTables
+  removeTables,
 } = require('../db-utils');
 
 describe('pg', () => {
@@ -26,7 +26,7 @@ describe('pg', () => {
 
   beforeEach(() => {
     options = {
-      pruneSessionInterval: false
+      pruneSessionInterval: false,
     };
   });
 
@@ -100,7 +100,7 @@ describe('pg', () => {
       await Promise.all([
         store._asyncQuery('SELECT COUNT(sid) FROM session'),
         store._asyncQuery('SELECT COUNT(sid) FROM session'),
-        store._asyncQuery('SELECT COUNT(sid) FROM session')
+        store._asyncQuery('SELECT COUNT(sid) FROM session'),
       ]);
 
       asyncQuerySpy.should.have.been.called;

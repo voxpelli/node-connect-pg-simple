@@ -37,7 +37,7 @@ describe('pgPromise', () => {
       secret,
       resave: false,
       saveUninitialized: true,
-      cookie: { maxAge }
+      cookie: { maxAge },
     }));
 
     app.get('/', (_req, res) => {
@@ -97,7 +97,7 @@ describe('pgPromise', () => {
         .should.eventually.have.nested.property('rows[0].count', '0')
         .then(() => Promise.all([
           request(app).get('/'),
-          agent.get('/')
+          agent.get('/'),
         ]))
         .then(() => queryPromise('SELECT COUNT(sid) FROM session'))
         .should.eventually.have.nested.property('rows[0].count', '2')
