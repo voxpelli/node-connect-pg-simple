@@ -1,5 +1,5 @@
 {
   "extends": [
-    "@voxpelli"
+    "github>voxpelli/renovate-config:default"
   ]
 }
