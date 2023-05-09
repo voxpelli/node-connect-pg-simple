@@ -74,7 +74,7 @@
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "husky": "^8.0.3",
-    "installed-check": "^6.0.5",
+    "installed-check": "^7.0.0",
     "mocha": "^10.2.0",
     "npm-run-all2": "^6.0.5",
     "pg-promise": "^10.15.4",
