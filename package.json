@@ -82,7 +82,7 @@
     "sinon": "^15.0.4",
     "sinon-chai": "^3.7.0",
     "supertest": "^6.3.3",
-    "type-coverage": "^2.25.3",
-    "typescript": "~5.0.4"
+    "type-coverage": "^2.26.0",
+    "typescript": "~5.1.3"
   }
 }
