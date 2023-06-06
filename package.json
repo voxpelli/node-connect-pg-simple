@@ -59,7 +59,7 @@
     "cookie-signature": "^1.2.1",
     "cookiejar": "^2.1.4",
     "dependency-check": "^5.0.0-7",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.1.4",
     "eslint": "^8.40.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-es": "^4.1.0",
