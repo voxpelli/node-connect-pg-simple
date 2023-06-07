@@ -145,7 +145,7 @@ module.exports = function (session) {
         }
         this.#pool = new (require('pg')).Pool(conObject);
         this.#pool.on('error', err => {
-          this.#errorLog('PG Pool error:', err.message);
+          this.#errorLog('PG Pool error:', err);
         });
         this.#ownsPg = true;
       }
@@ -256,7 +256,7 @@ module.exports = function (session) {
         }
 
         if (err) {
-          this.#errorLog('Failed to prune sessions:', err.message);
+          this.#errorLog('Failed to prune sessions:', err);
         }
 
         this.#clearPruneTimer();
