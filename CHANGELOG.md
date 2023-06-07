@@ -1,5 +1,13 @@
 # Changelog
 
+## 8.0.0 (2022-11-12)
+
+- **Breaking change:** Require Node version `^14.18.0 || >=16.0.0`
+- **Notable:** Mark most private methods and properties as actually private using the [Private class feature](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_class_fields) (having the name begin with a `#`) This **can be breaking** if you relied on those properties or methods
+- **Internal:** Update included version of `pg`
+- **Internal:** Use `node:` to import built in modules
+- ...and a lot of updates to dev dependencies, GitHub Action workflows etc
+
 ## 7.0.0 (2021-09-06)
 
 * **Breaking change:** Now requires at least Node.js 12.x
