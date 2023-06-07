@@ -1,5 +1,12 @@
 # Changelog
 
+## 9.0.0 (2023-06-07)
+
+- **Breaking change:** Require Node version `>=16.0.0`
+- **Notable:** Start automatic pruning lazily. Wait for first use of the session manager before scheduling the pruning. #285
+- **Change:** Log whole error object instead of only message. Thanks @safareli! #225
+- ...and internal updates to dev dependencies etc
+
 ## 8.0.0 (2022-11-12)
 
 - **Breaking change:** Require Node version `^14.18.0 || >=16.0.0`
