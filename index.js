@@ -161,7 +161,6 @@ module.exports = function (session) {
             (delay => Math.ceil(delay / 2 + delay * Math.random()))
           );
         }
-        setImmediate(() => { this.pruneSessions(); });
       }
     }
 
@@ -215,29 +214,32 @@ module.exports = function (session) {
     async close () {
       this.closed = true;
 
-      if (this.pruneTimer) {
-        clearTimeout(this.pruneTimer);
-        this.pruneTimer = undefined;
-      }
+      this.#clearPruneTimer();
 
       if (this.#ownsPg && this.#pool) {
         await this.#pool.end();
       }
     }
 
-    /**
-     * Get a new prune delay
-     *
-     * @returns {number} the quoted schema + table for use in queries
-     * @access private
-     */
-    #getPruneDelay () {
-      const delay = this.#pruneSessionInterval;
+    #initPruneTimer () {
+      if (this.#pruneSessionInterval && !this.closed && !this.pruneTimer) {
+        const delay = this.#pruneSessionRandomizedInterval
+          ? this.#pruneSessionRandomizedInterval(this.#pruneSessionInterval)
+          : this.#pruneSessionInterval;
 
-      if (!delay) throw new Error('Can not calculate delay when pruning is inactivated');
-      if (this.#pruneSessionRandomizedInterval) return this.#pruneSessionRandomizedInterval(delay);
+        this.pruneTimer = setTimeout(
+          () => { this.pruneSessions(); },
+          delay
+        );
+        this.pruneTimer.unref();
+      }
+    }
 
-      return delay;
+    #clearPruneTimer () {
+      if (this.pruneTimer) {
+        clearTimeout(this.pruneTimer);
+        this.pruneTimer = undefined;
+      }
     }
 
     /**
@@ -257,16 +259,8 @@ module.exports = function (session) {
           this.#errorLog('Failed to prune sessions:', err.message);
         }
 
-        if (this.#pruneSessionInterval && !this.closed) {
-          if (this.pruneTimer) {
-            clearTimeout(this.pruneTimer);
-          }
-          this.pruneTimer = setTimeout(
-            () => { this.pruneSessions(); },
-            this.#getPruneDelay()
-          );
-          this.pruneTimer.unref();
-        }
+        this.#clearPruneTimer();
+        this.#initPruneTimer();
       });
     }
 
@@ -364,6 +358,8 @@ module.exports = function (session) {
      * @access public
      */
     get (sid, fn) {
+      this.#initPruneTimer();
+
       this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= to_timestamp($2)', [sid, currentTimestamp()], (err, data) => {
         if (err) { return fn(err); }
         // eslint-disable-next-line unicorn/no-null
@@ -386,6 +382,8 @@ module.exports = function (session) {
      * @access public
      */
     set (sid, sess, fn) {
+      this.#initPruneTimer();
+
       const expireTime = this.#getExpireTime(sess);
       const query = 'INSERT INTO ' + this.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 ON CONFLICT (sid) DO UPDATE SET sess=$1, expire=to_timestamp($2) RETURNING sid';
 
@@ -404,6 +402,8 @@ module.exports = function (session) {
      * @access public
      */
     destroy (sid, fn) {
+      this.#initPruneTimer();
+
       this.query(
         'DELETE FROM ' + this.quotedTable() + ' WHERE sid = $1',
         [sid],
@@ -420,6 +420,8 @@ module.exports = function (session) {
      * @access public
      */
     touch (sid, sess, fn) {
+      this.#initPruneTimer();
+
       if (this.#disableTouch) {
         // eslint-disable-next-line unicorn/no-null
         fn && fn(null);
