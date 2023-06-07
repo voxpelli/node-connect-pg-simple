@@ -130,7 +130,7 @@ describe('Express', () => {
 
     describe('touching', () => {
       it('should update expiry dates on existing sessions when rolling is set', async () => {
-        const clock = sinon.useFakeTimers({ now: 1483228800000 });
+        const clock = sinon.useFakeTimers({ now: 1483228800000, shouldClearNativeTimers: true });
 
         store = new (connectPgSimple(session))({ conObject });
 
@@ -157,7 +157,7 @@ describe('Express', () => {
       });
 
       it('should not update expiry dates on existing sessions when disableTouch is set', async () => {
-        const clock = sinon.useFakeTimers({ now: 1483228800000 });
+        const clock = sinon.useFakeTimers({ now: 1483228800000, shouldClearNativeTimers: true });
 
         store = new (connectPgSimple(session))({ conObject, disableTouch: true });
 
@@ -190,7 +190,7 @@ describe('Express', () => {
       const app = appSetup(store);
       const agent = request.agent(app);
 
-      const clock = sinon.useFakeTimers(Date.now());
+      const clock = sinon.useFakeTimers({ now: Date.now(), shouldClearNativeTimers: true });
 
       return queryPromise('SELECT COUNT(sid) FROM session')
         .should.eventually.have.nested.property('rows[0].count', '0')

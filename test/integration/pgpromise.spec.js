@@ -91,7 +91,7 @@ describe('pgPromise', () => {
       const app = appSetup(store);
       const agent = request.agent(app);
 
-      const clock = sinon.useFakeTimers(Date.now());
+      const clock = sinon.useFakeTimers({ now: Date.now(), shouldClearNativeTimers: true });
 
       return queryPromise('SELECT COUNT(sid) FROM session')
         .should.eventually.have.nested.property('rows[0].count', '0')
