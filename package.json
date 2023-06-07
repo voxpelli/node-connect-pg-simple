@@ -26,8 +26,8 @@
     "table.sql"
   ],
   "scripts": {
-    "check:dependency-check": "dependency-check *.js 'test/**/*.js' --no-dev -i @types/pg",
-    "check:installed-check": "installed-check -i eslint-plugin-jsdoc",
+    "check:installed-check": "installed-check -i eslint-plugin-jsdoc -i knip",
+    "check:knip": "knip",
     "check:lint": "eslint --report-unused-disable-directives .",
     "check:tsc": "tsc",
     "check:type-coverage": "type-coverage --detail --strict --at-least 85 --ignore-files 'test/**/*'",
@@ -58,7 +58,6 @@
     "chai-as-promised": "^7.1.1",
     "cookie-signature": "^1.2.1",
     "cookiejar": "^2.1.4",
-    "dependency-check": "^5.0.0-7",
     "dotenv": "^16.1.4",
     "eslint": "^8.42.0",
     "eslint-plugin-es-x": "^7.1.0",
@@ -74,6 +73,7 @@
     "express-session": "^1.17.3",
     "husky": "^8.0.3",
     "installed-check": "^7.1.1",
+    "knip": "^2.13.0",
     "mocha": "^10.2.0",
     "npm-run-all2": "^6.0.5",
     "pg-promise": "^11.4.3",
