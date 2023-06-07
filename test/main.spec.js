@@ -2,6 +2,8 @@
 
 'use strict';
 
+const { promisify } = require('node:util');
+
 const chai = require('chai');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
@@ -61,16 +63,24 @@ describe('PGStore', () => {
       sinon.spy(store, 'pruneSessions');
 
       const mock = sinon.mock(store);
-      mock.expects('query').twice().yields();
+      mock.expects('query').thrice().yields();
 
       // Execution
 
       await fakeClock.tickAsync(1);
 
-      store.pruneSessions.callCount.should.equal(1, 'Called from constructor');
+      store.pruneSessions.callCount.should.equal(0, 'Called from constructor');
 
       await fakeClock.tickAsync(ACTUAL_DELAY);
+      store.pruneSessions.callCount.should.equal(0, 'Still not called');
 
+      await promisify(store.set.bind(store))('123', { cookie: { foo: 'bar' } });
+      store.pruneSessions.callCount.should.equal(0, 'Still not called');
+
+      await fakeClock.tickAsync(ACTUAL_DELAY);
+      store.pruneSessions.callCount.should.equal(1, 'Called lazily by interval');
+
+      await fakeClock.tickAsync(ACTUAL_DELAY);
       store.pruneSessions.callCount.should.equal(2, 'Called by interval');
       store.close();
 
@@ -92,21 +102,29 @@ describe('PGStore', () => {
       sinon.spy(store, 'pruneSessions');
 
       const mock = sinon.mock(store);
-      mock.expects('query').twice().yields();
+      mock.expects('query').thrice().yields();
 
       // Execution
 
       await fakeClock.tickAsync(1);
 
-      store.pruneSessions.callCount.should.equal(1, 'Called from constructor');
+      store.pruneSessions.callCount.should.equal(0, 'Called from constructor');
 
       await fakeClock.tickAsync(ACTUAL_DELAY);
+      store.pruneSessions.callCount.should.equal(0, 'Still not called');
 
+      await promisify(store.set.bind(store))('123', { cookie: { foo: 'bar' } });
+      store.pruneSessions.callCount.should.equal(0, 'Still not called');
+
+      await fakeClock.tickAsync(ACTUAL_DELAY);
+      store.pruneSessions.callCount.should.equal(1, 'Called lazily by interval');
+
+      await fakeClock.tickAsync(ACTUAL_DELAY);
       store.pruneSessions.callCount.should.equal(2, 'Called by interval');
       store.close();
       mock.verify();
 
-      options.pruneSessionRandomizedInterval.should.have.been.calledTwice;
+      options.pruneSessionRandomizedInterval.should.have.been.calledThrice;
     });
 
     it('should run on exactly the default interval and close when no randomness', async () => {
@@ -119,16 +137,24 @@ describe('PGStore', () => {
       sinon.spy(store, 'pruneSessions');
 
       const mock = sinon.mock(store);
-      mock.expects('query').twice().yields();
+      mock.expects('query').thrice().yields();
 
       // Execution
 
       await fakeClock.tickAsync(1);
 
-      store.pruneSessions.callCount.should.equal(1, 'Called from constructor');
+      store.pruneSessions.callCount.should.equal(0, 'Not called from constructor');
 
       await fakeClock.tickAsync(DEFAULT_DELAY);
+      store.pruneSessions.callCount.should.equal(0, 'Still not called');
 
+      await promisify(store.set.bind(store))('123', { cookie: { foo: 'bar' } });
+      store.pruneSessions.callCount.should.equal(0, 'Still not called');
+
+      await fakeClock.tickAsync(DEFAULT_DELAY);
+      store.pruneSessions.callCount.should.equal(1, 'Called lazily by interval');
+
+      await fakeClock.tickAsync(DEFAULT_DELAY);
       store.pruneSessions.callCount.should.equal(2, 'Called by interval');
       store.close();
       mock.verify();
@@ -144,10 +170,17 @@ describe('PGStore', () => {
 
       const mock = sinon.mock(store);
 
-      mock.expects('query').twice().yields();
+      mock.expects('query').thrice().yields();
 
       await fakeClock.tickAsync(1);
-      store.pruneSessions.callCount.should.equal(1, 'Called from constructor');
+      store.pruneSessions.callCount.should.equal(0, 'Not called from constructor');
+
+      await promisify(store.set.bind(store))('123', { cookie: { foo: 'bar' } });
+      store.pruneSessions.callCount.should.equal(0, 'Still not called');
+
+      await fakeClock.tickAsync(1000);
+      store.pruneSessions.callCount.should.equal(1, 'Called lazily by custom interval');
+
       await fakeClock.tickAsync(1000);
       store.pruneSessions.callCount.should.equal(2, 'Called by custom interval');
       store.close();
@@ -161,12 +194,20 @@ describe('PGStore', () => {
 
       const mock = sinon.mock(store);
 
-      mock.expects('query').never().yields();
+      mock.expects('query').once().yields();
 
       await fakeClock.tickAsync(1);
       store.pruneSessions.called.should.equal(false, 'Not called from constructor');
+
       await fakeClock.tickAsync(60000);
       store.pruneSessions.called.should.equal(false, 'Not called by interval');
+
+      await promisify(store.set.bind(store))('123', { cookie: { foo: 'bar' } });
+      store.pruneSessions.called.should.equal(false, 'Not called lazily');
+
+      await fakeClock.tickAsync(60000);
+      store.pruneSessions.called.should.equal(false, 'Not called by interval');
+
       store.close();
       mock.verify();
     });
