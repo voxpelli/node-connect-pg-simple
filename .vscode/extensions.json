@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "bierner.github-markdown-preview",
+    "dbaeumer.vscode-eslint",
+    "editorconfig.editorconfig",
+    "github.vscode-github-actions",
+    "gruntfuggly.todo-tree",
+    "hbenl.vscode-mocha-test-adapter",
+    "mikestead.dotenv",
+    "usernamehw.errorlens",
+    "vivaxy.vscode-conventional-commits"
+  ]
+}
