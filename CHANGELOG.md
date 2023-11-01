@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.0.1](https://github.com/voxpelli/node-connect-pg-simple/compare/v9.0.0...v9.0.1) (2023-11-01)
+
+
+### Bug Fixes
+
+* 18: Move @types/pg to dev dependencies ([ea4a9c1](https://github.com/voxpelli/node-connect-pg-simple/commit/ea4a9c1d26f4a712a59ab198f3192894c16db963))
+
 ## 9.0.0 (2023-06-07)
 
 - **Breaking change:** Require Node version `>=16.0.0`
