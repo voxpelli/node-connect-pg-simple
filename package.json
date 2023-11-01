@@ -73,7 +73,7 @@
     "express-session": "^1.17.3",
     "husky": "^8.0.3",
     "installed-check": "^7.1.1",
-    "knip": "^2.13.0",
+    "knip": "^2.38.5",
     "mocha": "^10.2.0",
     "npm-run-all2": "^6.0.5",
     "pg-promise": "^11.4.3",
