@@ -86,7 +86,13 @@ describe('Express', () => {
       return request(app)
         .get('/')
         .then(res => {
-          const sessionCookie = new Cookie(res.header['set-cookie'][0]);
+          const cookieHeader = /** @type {string[]|undefined} */ (res.header['set-cookie']);
+
+          if (!cookieHeader || !cookieHeader[0]) {
+            throw new TypeError('Unexpected cookie header');
+          }
+
+          const sessionCookie = new Cookie(cookieHeader[0]);
           const cookieValue = decodeURIComponent(sessionCookie.value);
 
           cookieValue.slice(0, 2).should.equal('s:');
