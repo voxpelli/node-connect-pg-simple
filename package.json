@@ -83,6 +83,6 @@
     "supertest": "^6.3.3",
     "type-coverage": "^2.27.0",
     "typescript": "~5.3.2",
-    "validate-conventional-commit": "^1.0.2"
+    "validate-conventional-commit": "^1.0.3"
   }
 }
