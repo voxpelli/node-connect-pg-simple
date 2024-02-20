@@ -58,7 +58,7 @@
     "chai-as-promised": "^7.1.1",
     "cookie-signature": "^1.2.1",
     "cookiejar": "^2.1.4",
-    "dotenv": "^16.4.1",
+    "dotenv": "^16.4.5",
     "eslint": "^8.56.0",
     "eslint-plugin-es-x": "^7.5.0",
     "eslint-plugin-import": "^2.29.1",
