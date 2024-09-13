@@ -7,11 +7,13 @@ const pathModule = require('node:path');
 
 const pg = require('pg');
 
+// eslint-disable-next-line n/no-process-env
 const dotEnvFile = process.env['DOTENV_FILE'] || pathModule.resolve(__dirname, './.env');
 
 require('dotenv').config({ path: dotEnvFile });
 
 const conObject = {
+  // eslint-disable-next-line n/no-process-env
   database: process.env['PGDATABASE'] || 'connect_pg_simple_test',
 };
 

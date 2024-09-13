@@ -1,3 +1,4 @@
+/* eslint-disable promise/prefer-await-to-then */
 // @ts-check
 
 'use strict';

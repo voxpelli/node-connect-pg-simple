@@ -1,3 +1,4 @@
+/* eslint-disable promise/prefer-await-to-then */
 /* eslint-disable unicorn/no-await-expression-member */
 // @ts-check
 

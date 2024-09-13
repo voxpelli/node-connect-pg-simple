@@ -1,3 +1,4 @@
+/* eslint-disable n/no-process-env */
 // @ts-check
 
 'use strict';
