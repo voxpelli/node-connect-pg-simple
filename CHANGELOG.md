@@ -1,5 +1,36 @@
 # Changelog
 
+## [10.0.0](https://github.com/voxpelli/node-connect-pg-simple/compare/v9.0.1...v10.0.0) (2024-09-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* require node.js >=18
+
+### 🩹 Fixes
+
+* add name to main function ([c98e2ec](https://github.com/voxpelli/node-connect-pg-simple/commit/c98e2ecc2fe5b99531d6368dd515f3db157d8825))
+* **deps:** use latest version of `pg` ([81b5630](https://github.com/voxpelli/node-connect-pg-simple/commit/81b5630955c2b19c4797abcc10100cbc2020c256))
+* require node.js &gt;=18 ([d51b6ca](https://github.com/voxpelli/node-connect-pg-simple/commit/d51b6ca773ac151f44f6b96c7c17fbfffd280967))
+
+
+### 🧹 Chores
+
+* **deps:** update `knip` ([f78ef50](https://github.com/voxpelli/node-connect-pg-simple/commit/f78ef50516f1eeee8bf687cf0da2d4fb8114ffa6))
+* **deps:** update `validate-conventional-commit` ([84f525a](https://github.com/voxpelli/node-connect-pg-simple/commit/84f525a1edc700958758cb72bd93412aefef144e))
+* **deps:** update dependency dotenv to ^16.4.5 ([#308](https://github.com/voxpelli/node-connect-pg-simple/issues/308)) ([f97bd51](https://github.com/voxpelli/node-connect-pg-simple/commit/f97bd519c5e26e32b2c3291fabb58ba40d058a71))
+* **deps:** update dependency express to ^4.21.0 ([#310](https://github.com/voxpelli/node-connect-pg-simple/issues/310)) ([01c9a55](https://github.com/voxpelli/node-connect-pg-simple/commit/01c9a55a09337d7c2e4b32da411c74a3c3549e7f))
+* **deps:** update dependency express-session to ^1.18.0 ([#309](https://github.com/voxpelli/node-connect-pg-simple/issues/309)) ([eef0e31](https://github.com/voxpelli/node-connect-pg-simple/commit/eef0e31715ee8e3d8207a18a70fe33aa2a46257b))
+* **deps:** update dependency pg-promise to ^11.9.1 ([#312](https://github.com/voxpelli/node-connect-pg-simple/issues/312)) ([a553301](https://github.com/voxpelli/node-connect-pg-simple/commit/a553301cf5f35a1f49831eea0c3f78cfeef92fe5))
+* **deps:** update dev dependencies ([d4488dc](https://github.com/voxpelli/node-connect-pg-simple/commit/d4488dcd0f7e6c1d7e916268bc322733df27aa2b))
+* **deps:** update dev dependencies ([21e41c4](https://github.com/voxpelli/node-connect-pg-simple/commit/21e41c445318a5337cc155fd8dad5820601b6ef2))
+* **deps:** update linting dependencies ([817f082](https://github.com/voxpelli/node-connect-pg-simple/commit/817f082769b22d59ce9780f42251d768f54a8b50))
+* **deps:** update linting dependencies ([a4e9e46](https://github.com/voxpelli/node-connect-pg-simple/commit/a4e9e469cb52ddb72db108930ee56dfab07e6934))
+* **deps:** update type dependencies ([97e581f](https://github.com/voxpelli/node-connect-pg-simple/commit/97e581f8f8a3a29372f697f77a1514259c75b05f))
+* **deps:** update typescript setup ([7c86411](https://github.com/voxpelli/node-connect-pg-simple/commit/7c8641113c17b6294463cebd3c636fdddd4dbbfe))
+* **deps:** use neostandard linting ([354f6b3](https://github.com/voxpelli/node-connect-pg-simple/commit/354f6b310f5fa6225b34ae49d9210ee6694e53c8))
+* fix @types/superagent type regression ([649888c](https://github.com/voxpelli/node-connect-pg-simple/commit/649888c887b418bb67d9ce638cc05435cc1ede74))
+
 ## [9.0.1](https://github.com/voxpelli/node-connect-pg-simple/compare/v9.0.0...v9.0.1) (2023-11-01)
 
 
