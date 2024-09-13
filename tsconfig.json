@@ -1,9 +1,12 @@
 {
-  "extends": "@voxpelli/tsconfig/node16.json",
+  "extends": "@voxpelli/tsconfig/node18.json",
   "files": [
     "index.js"
   ],
   "include": [
     "test/**/*.js"
-  ]
+  ],
+  "compilerOptions": {
+    "types": ["node", "mocha"]
+  }
 }
