@@ -17,7 +17,7 @@
     "pg": "^8.8.0"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": "^18.18.0 || ^20.9.0 || >=22.0.0"
   },
   "main": "index.js",
   "files": [
@@ -25,7 +25,7 @@
     "table.sql"
   ],
   "scripts": {
-    "check:installed-check": "installed-check -i @voxpelli/eslint-config -i eslint -i knip -i installed-check",
+    "check:installed-check": "installed-check",
     "check:knip": "knip",
     "check:lint": "eslint",
     "check:tsc": "tsc",
