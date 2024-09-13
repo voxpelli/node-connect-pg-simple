@@ -71,7 +71,7 @@ const escapePgIdentifier = (value) => value.replaceAll('"', '""');
  * @param {ExpressSession} session
  * @returns {ExpressSessionStore}
  */
-module.exports = function (session) {
+module.exports = function connectPgSimple (session) {
   /** @type {ExpressSessionStore} */
   const Store = session.Store ||
     // @ts-ignore
@@ -133,6 +133,7 @@ module.exports = function (session) {
         this.#pgPromise = options.pgPromise;
         this.#ownsPg = false;
       } else {
+        // eslint-disable-next-line n/no-process-env
         const conString = options.conString || process.env['DATABASE_URL'];
         let conObject = options.conObject;
 
