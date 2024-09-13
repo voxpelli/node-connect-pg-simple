@@ -60,7 +60,7 @@
     "cookiejar": "^2.1.4",
     "dotenv": "^16.4.1",
     "eslint": "^9.10.0",
-    "express": "^4.18.2",
+    "express": "^4.21.0",
     "express-session": "^1.17.3",
     "husky": "^9.1.6",
     "installed-check": "^9.3.0",
