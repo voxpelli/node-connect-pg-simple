@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.0.1](https://github.com/voxpelli/node-connect-pg-simple/compare/v10.0.0...v10.0.1) (2024-10-02)
+
+
+### 📚 Documentation
+
+* indicate that package is lifted at Tidelift ([86ca86a](https://github.com/voxpelli/node-connect-pg-simple/commit/86ca86a86bdd700186f6ff510e7e176961a44366))
+
 ## [10.0.0](https://github.com/voxpelli/node-connect-pg-simple/compare/v9.0.1...v10.0.0) (2024-09-13)
 
 
