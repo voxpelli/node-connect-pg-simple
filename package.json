@@ -56,7 +56,7 @@
     "c8": "^10.1.2",
     "chai": "^4.5.0",
     "chai-as-promised": "^7.1.2",
-    "cookie-signature": "^1.2.1",
+    "cookie-signature": "^1.2.2",
     "cookiejar": "^2.1.4",
     "dotenv": "^16.4.5",
     "eslint": "^9.10.0",
