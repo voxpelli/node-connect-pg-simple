@@ -1,5 +1,18 @@
 # Changelog
 
+## [10.0.1](https://github.com/voxpelli/node-connect-pg-simple/compare/v10.0.0...v10.0.1) (2025-04-01)
+
+
+### 📚 Documentation
+
+* indicate that package is lifted at Tidelift ([86ca86a](https://github.com/voxpelli/node-connect-pg-simple/commit/86ca86a86bdd700186f6ff510e7e176961a44366))
+
+
+### 🧹 Chores
+
+* **deps:** update dependency @voxpelli/eslint-config to v22 ([#321](https://github.com/voxpelli/node-connect-pg-simple/issues/321)) ([061548e](https://github.com/voxpelli/node-connect-pg-simple/commit/061548ec911781b32e5dec94bdeceb7f55f15787))
+* **deps:** update linting dependencies ([#316](https://github.com/voxpelli/node-connect-pg-simple/issues/316)) ([c46daef](https://github.com/voxpelli/node-connect-pg-simple/commit/c46daef6d06d257a0fb946ad90b9fb9a652bbe90))
+
 ## [10.0.0](https://github.com/voxpelli/node-connect-pg-simple/compare/v9.0.1...v10.0.0) (2024-09-13)
 
 
