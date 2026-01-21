@@ -251,7 +251,7 @@ module.exports = function connectPgSimple (session) {
      * @access public
      */
     pruneSessions (fn) {
-      this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < to_timestamp($1)', [currentTimestamp()], err => {
+      this.query('DELETE FROM ' + this.quotedTable() + ' WHERE expire < pg_catalog.to_timestamp($1::double precision)', [currentTimestamp()], err => {
         if (fn && typeof fn === 'function') {
           return fn(err);
         }
@@ -361,7 +361,7 @@ module.exports = function connectPgSimple (session) {
     get (sid, fn) {
       this.#initPruneTimer();
 
-      this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= to_timestamp($2)', [sid, currentTimestamp()], (err, data) => {
+      this.query('SELECT sess FROM ' + this.quotedTable() + ' WHERE sid = $1 AND expire >= pg_catalog.to_timestamp($2::double precision)', [sid, currentTimestamp()], (err, data) => {
         if (err) { return fn(err); }
         // eslint-disable-next-line unicorn/no-null
         if (!data) { return fn(null); }
@@ -386,7 +386,7 @@ module.exports = function connectPgSimple (session) {
       this.#initPruneTimer();
 
       const expireTime = this.#getExpireTime(sess);
-      const query = 'INSERT INTO ' + this.quotedTable() + ' (sess, expire, sid) SELECT $1, to_timestamp($2), $3 ON CONFLICT (sid) DO UPDATE SET sess=$1, expire=to_timestamp($2) RETURNING sid';
+      const query = 'INSERT INTO ' + this.quotedTable() + ' (sess, expire, sid) SELECT $1, pg_catalog.to_timestamp($2::double precision), $3 ON CONFLICT (sid) DO UPDATE SET sess=$1, expire=pg_catalog.to_timestamp($2::double precision) RETURNING sid';
 
       this.query(
         query,
@@ -432,7 +432,7 @@ module.exports = function connectPgSimple (session) {
       const expireTime = this.#getExpireTime(sess);
 
       this.query(
-        'UPDATE ' + this.quotedTable() + ' SET expire = to_timestamp($1) WHERE sid = $2 RETURNING sid',
+        'UPDATE ' + this.quotedTable() + ' SET expire = pg_catalog.to_timestamp($1::double precision) WHERE sid = $2 RETURNING sid',
         [expireTime, sid],
         err => { fn && fn(err); }
       );
